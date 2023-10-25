@@ -1,28 +1,76 @@
 <?php
 class Products_model extends CI_Model
 {
-  private $PriceList = 12;
-  private $CostList = 13;
+  private $tb = "products";
+
   public function __construct()
   {
     parent::__construct();
   }
 
-
-	public function get($ItemCode, $priceList = 12)
+  public function add(array $ds = array())
   {
-    $rs = $this->ms
-    ->select("P.ItemCode AS code, P.ItemName AS name, P.FrgnName AS description, P.UgpEntry, P.SUoMEntry AS uom_id, P.FirmCode")
-		->select("P.DfltWH AS dfWhsCode, P.OnHand, P.IsCommited, P.OnOrder, P.TreeType, P.LstEvlPric AS cost")
-    ->select("P.VatGourpSa AS vat_group")
-    ->select("U.UomEntry AS uom_id, U.UomCode AS uom_code, U.UomName AS uom, P1.Price AS price")
-    ->select("T.Rate AS vat_rate")
-    ->from("OITM AS P")
-		->join("OUOM AS U", "P.SUoMEntry = U.UomEntry", "left")
-    ->join("ITM1 AS P1", "P.ItemCode = P1.ItemCode AND P1.PriceList = {$priceList}", "left")
-    ->join("OVTG AS T", "T.Code = P.VatGourpSa", "left")
-    ->where("P.ItemCode", $ItemCode)
-    ->get();
+    if( ! empty($ds))
+    {
+      if($this->db->insert($this->tb, $ds))
+      {
+        return $this->db->insert_id();
+      }
+    }
+
+    return FALSE;
+  }
+
+
+  public function update_by_id($id, array $ds = array())
+  {
+    if( ! empty($ds))
+    {
+      return $this->db->where('id', $id)->update($this->tb, $ds);
+    }
+
+    return FALSE;
+  }
+
+
+  public function update_by_code($code, array $ds = array())
+  {
+    if( ! empty($ds))
+    {
+      return $this->db->where('code', $code)->update($this->tb, $ds);
+    }
+
+    return FALSE;
+  }
+
+
+  public function get_by_id($id)
+  {
+    $rs = $this->db->where('id', $id)->get($this->tb);
+
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row();
+    }
+
+    return NULL;
+  }
+
+  public function get_by_code($code)
+  {
+    $rs = $this->db->where('code', $code)->get($this->tb);
+
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row();
+    }
+
+    return NULL;
+  }
+
+  public function get_by_barcode($barcode)
+  {
+    $rs = $this->db->where('barcode', $barcode)->get($this->tb);
 
     if($rs->num_rows() === 1)
     {
@@ -33,190 +81,78 @@ class Products_model extends CI_Model
   }
 
 
-  public function get_childs($ItemCode)
+  public function get_id_by_barcode($barcode)
   {
-    $rs = $this->ms
-    ->select("C.Father, C.Code AS code, C.Quantity AS qty")
-    ->from("ITT1 AS C")
-    ->join("OITT AS F", "C.Father = F.Code AND F.TreeType = 'S'")
-    ->where('C.Father', $ItemCode)
-    ->get();
-
-    if($rs->num_rows() > 0)
-    {
-      return $rs->result();
-    }
-
-    return NULL;
-  }
-
-
-  public function price_list($ItemCode, $PriceList)
-  {
-    $rs = $this->ms->select('Price, UomEntry')->where('ItemCode', $ItemCode)->where('PriceList', $PriceList)->get('ITM1');
-    if($rs->num_rows() === 1)
-    {
-      return $rs->row();
-    }
-
-    return NULL;
-  }
-
-
-  public function get_special_price($ItemCode, $CardCode, $PriceList)
-  {
-    $rs = $this->ms
-    ->select('ITM1.Price AS Price')
-    ->select('OSPP.Price AS PriceAfDisc')
-    ->select('OSPP.Discount')
-    ->select('ITM1.UomEntry')
-    ->from('OSPP')
-    ->join('ITM1', 'OSPP.ItemCode = ITM1.ItemCode AND ITM1.PriceList = OSPP.ListNum', 'left')
-    ->where('OSPP.ItemCode', $ItemCode)
-    ->where('OSPP.CardCode', $CardCode)
-    ->where('OSPP.ListNum', $PriceList)
-    ->where('OSPP.Valid', 'Y')
-    ->group_start()
-    ->where('OSPP.ValidFrom <=', from_date())
-    ->or_where('OSPP.ValidFrom IS NULL', NULL, FALSE)
-    ->group_end()
-    ->group_start()
-    ->where('OSPP.ValidTo >=', to_date())
-    ->or_where('OSPP.ValidTo IS NULL', NULL, FALSE)
-    ->group_end()
-    ->get();
-
-    if($rs->num_rows() == 1)
-    {
-      return $rs->row();
-    }
-
-    return NULL;
-  }
-
-
-  public function get_all_uom()
-  {
-    $rs = $this->ms->get('OUOM');
-
-    if($rs->num_rows() > 0)
-    {
-      return $rs->result();
-    }
-
-    return NULL;
-  }
-
-
-  public function get_uom_list($UgpEntry)
-  {
-    $rs = $this->ms
-    ->select("UGP1.UomEntry, UGP1.BaseQty, OUOM.UomCode, OUOM.UomName")
-    ->from('UGP1')
-    ->join('OUOM', 'UGP1.UomEntry = OUOM.UomEntry', 'left')
-    ->where('UGP1.UgpEntry', $UgpEntry)
-    ->get();
-
-    if($rs->num_rows() > 0)
-    {
-      return $rs->result();
-    }
-
-    return NULL;
-  }
-
-
-  public function get_uom_list_by_item_code($ItemCode)
-  {
-    $rs = $this->ms
-    ->select('UGP1.UomEntry, UGP1.BaseQty, OUOM.UomCode, OUOM.UomName')
-    ->from('UGP1')
-    ->join('OITM', 'OITM.UgpEntry = UGP1.UgpEntry', 'left')
-    ->join('OUOM', 'UGP1.UomEntry = OUOM.UomEntry', 'left')
-    ->where('OITM.ItemCode', $ItemCode)
-    ->get();
-
-    if($rs->num_rows() > 0)
-    {
-      return $rs->result();
-    }
-
-    return NULL;
-  }
-
-
-  public function get_base_qty($itemCode, $UomEntry)
-  {
-    $rs = $this->ms
-    ->select('BaseQty')
-    ->from('OITM')
-    ->join('UGP1', 'OITM.UgpEntry = UGP1.UgpEntry', 'left')
-    ->where('OITM.ItemCode', $itemCode)
-    ->where('UGP1.UomEntry', $UomEntry)
-    ->get();
+    $rs = $this->db->where('barcode', $barcode)->get($this->tb);
 
     if($rs->num_rows() === 1)
     {
-      return $rs->row()->BaseQty;
-    }
-
-    return 1;
-  }
-
-
-  public function get_uom($UomEntry)
-  {
-    $rs = $this->ms->where('UomEntry', $UomEntry)->get('OUOM');
-
-    if($rs->num_rows() === 1)
-    {
-      return $rs->row();
-    }
-
-    return NULL;
-  }
-
-  public function get_uom_name($UomCode)
-  {
-    $qr = "SELECT UomName AS name FROM OUOM WHERE UomCode = N'{$UomCode}'";
-    $rs = $this->ms->query($qr);
-
-    if($rs->num_rows() === 1)
-    {
-      return $rs->row()->name;
+      return $rs->row()->id;
     }
 
     return NULL;
   }
 
 
-  public function get_uom_id($UomCode)
+  public function count_rows(array $ds = array())
   {
-    $qr = "SELECT UomEntry FROM OUOM WHERE UomCode = N'{$UomCode}'";
-    $rs = $this->ms->query($qr);
-
-    if($rs->num_rows() === 1)
+    if( isset($ds['barcode']) && $ds['barcode'] != '')
     {
-      return $rs->row()->UomEntry;
+      $this->db->like('barcode', $ds['barcode']);
     }
 
-    return NULL;
+    if( isset($ds['code']) && $ds['code'] != '')
+    {
+      $this->db->like('code', $ds['code']);
+    }
+
+    if( isset($ds['name']) && $ds['name'] != '')
+    {
+      $this->db->like('name', $ds['name']);
+    }
+
+    if( isset($ds['style']) && $ds['style'] != '')
+    {
+      $this->db->like('style', $ds['style']);
+    }
+
+    if( isset($ds['active']) && $ds['active'] != 'all')
+    {
+      $this->db->where('active', $ds['active']);
+    }
+
+    return $this->db->count_all_results($this->tb);
   }
 
 
-
-  public function get_item_list($group = NULL)
+  public function get_list(array $ds = array(), $limit = 20, $offset = 0)
   {
-    $this->ms->select('ItemCode AS code, ItemName AS name, SalUnitMsr AS UoM');
-
-    if(!empty($group) && is_array($group))
+    if( isset($ds['barcode']) && $ds['barcode'] != '')
     {
-      $this->ms->where_in('ItmsGrpCod', $group);
+      $this->db->like('barcode', $ds['barcode']);
     }
 
-    $this->ms->order_by('ItemCode', 'ASC');
+    if( isset($ds['code']) && $ds['code'] != '')
+    {
+      $this->db->like('code', $ds['code']);
+    }
 
-    $rs = $this->ms->get('OITM');
+    if( isset($ds['name']) && $ds['name'] != '')
+    {
+      $this->db->like('name', $ds['name']);
+    }
+
+    if( isset($ds['style']) && $ds['style'] != '')
+    {
+      $this->db->like('style', $ds['style']);
+    }
+
+    if( isset($ds['active']) && $ds['active'] != 'all')
+    {
+      $this->db->where('active', $ds['active']);
+    }
+
+    $rs = $this->db->order_by('code', 'ASC')->limit($limit, $offset)->get($this->tb);
 
     if($rs->num_rows() > 0)
     {
@@ -227,203 +163,50 @@ class Products_model extends CI_Model
   }
 
 
-  public function get_items_by_range($pdFrom, $pdTo, $group = NULL)
+  public function is_exists_barcode($barcode, $id = NULL)
   {
-    $this->ms
-    ->select('ItemCode AS code, ItemName AS name, SalUnitMsr AS UoM')
-    ->where('ItemCode >=', $pdFrom)
-    ->where('ItemCode <=', $pdTo);
-
-    if(!empty($group) && is_array($group))
+    if( ! empty($id))
     {
-      $this->ms->where_in('ItmsGrpCod', $group);
+      $this->db->where('id !=', $id);
     }
 
-    $this->ms->order_by('ItemCode', 'ASC');
-
-    $rs = $this->ms->get('OITM');
-
-    if($rs->num_rows() > 0)
-    {
-      return $rs->result();
-    }
-
-    return  NULL;
+    return $this->db->where('barcode', $barcode)->count_all_results($this->tb);
   }
 
 
-
-  public function get_item_group_list()
+  public function is_exists_code($code, $id = NULL)
   {
-    $rs = $this->ms
-    ->select('ItmsGrpCod AS code, ItmsGrpNam AS name')
-    ->order_by('ItmsGrpCod', 'ASC')
-    ->get('OITB');
-
-    if($rs->num_rows() > 0)
+    if( ! empty($id))
     {
-      return $rs->result();
+      $this->db->where('id !=', $id);
     }
 
-    return NULL;
+    return $this->db->where('code', $code)->count_all_results($this->tb);
   }
 
 
-  public function get_average_cost($code)
+  public function get_items_last_sync()
 	{
-		$rs = $this->ms
-    ->select('LstEvlPric AS cost')
-    ->where('ItemCode', $code)
-    ->get('OITM');
+		$rs = $this->db->select_max('sync_at')->where('sync_status', 1)->get('products_sync_logs');
 
 		if($rs->num_rows() === 1)
     {
-      return $rs->row()->cost;
+      return $rs->row()->sync_at === NULL ? date('2019-01-01 00:00:00') : date('Y-m-d h:i:s', strtotime($rs->row()->sync_at));
     }
 
-    return NULL;
+    return date('2019-01-01 00:00:00');
 	}
 
 
-  public function get_item_cost($code)
-	{
-    $rs = $this->ms
-    ->select('LstEvlPric AS cost')
-    ->where('ItemCode', $code)
-    ->get('OITM');
-
-		if($rs->num_rows() === 1)
-    {
-      return $rs->row()->cost;
-    }    
-
-    return 0;
-	}
-
-
-  public function getItemByBarcode($barcode)
+  public function close_sync()
   {
-    $rs = $this->ms
-    ->select('OITM.ItemCode, OITM.ItemName, OBCD.UomEntry, OUOM.UomCode, OUOM.UomName, UGP1.BaseQty')
-    ->from('OBCD')
-    ->join('OITM', 'OITM.ItemCode = OBCD.ItemCode')
-    ->join('UGP1', 'OITM.UgpEntry = UGP1.UgpEntry AND OBCD.UomEntry = UGP1.UomEntry', 'left')
-    ->join('OUOM', 'OBCD.UomEntry = OUOM.UomEntry', 'left')
-    ->where('OBCD.BcdCode', $barcode)
-    ->order_by('OBCD.BcdEntry', 'DESC')
-    ->limit(1)
-    ->get();
+    $arr = array(
+      'sync_at' => now(),
+      'sync_by' => $this->_user->uname,
+      'sync_status' => 1
+    );
 
-    if($rs->num_rows() === 1)
-    {
-      return $rs->row();
-    }
-
-    return NULL;
-  }
-
-
-  public function getItemByCode($ItemCode)
-  {
-    $rs = $this->ms
-    ->select('OITM.ItemCode, OITM.ItemName, UGP1.UomEntry, UGP1.BaseQty, OUOM.UomCode, OUOM.UomName')
-    ->from('OITM')
-    ->join('UGP1', 'OITM.UgpEntry = UGP1.UgpEntry AND OITM.IUoMEntry = UGP1.UomEntry', 'left')
-    ->join('OUOM', 'UGP1.UomEntry = OUOM.UomEntry', 'left')
-    ->where('OITM.ItemCode', $ItemCode)
-    ->get();
-
-    if($rs->num_rows() === 1)
-    {
-      return $rs->row();
-    }
-
-    return NULL;
-  }
-
-
-  public function get_barcode_uom($ItemCode, $UomEntry)
-  {
-    $rs = $this->ms
-    ->select('BcdCode AS barcode')
-    ->where('ItemCode', $ItemCode)
-    ->where('UomEntry', $UomEntry)
-    ->get('OBCD');
-
-    if($rs->num_rows() > 0)
-    {
-      return $rs->row()->barcode;
-    }
-
-    return NULL;
-  }
-
-
-  public function get_barcode($ItemCode)
-  {
-    $rs = $this->ms
-    ->select('OBCD.BcdCode AS barcode')
-    ->from('OITM')
-    ->join('OBCD', 'OITM.ItemCode = OBCD.ItemCode AND OITM.IUoMEntry = OBCD.UomEntry')
-    ->where('OITM.ItemCode', $ItemCode)
-    ->get();
-
-    if($rs->num_rows() == 1)
-    {
-      return $rs->row()->barcode;
-    }
-
-    return $ItemCode;
-  }
-
-
-  public function get_item_code_uom_by_barcode($barcode)
-  {
-    $rs = $this->ms
-    ->select('ItemCode, UomEntry')
-    ->where('BcdCode', $barcode)
-    ->order_by('BcdEntry', 'DESC')
-    ->limit(1)
-    ->get('OBCD');
-
-    if($rs->num_rows() === 1)
-    {
-      return $rs->row();
-    }
-
-    return NULL;
-  }
-
-
-  public function getName($ItemCode)
-  {
-    $rs = $this->ms->select('ItemName')->where('ItemCode', $ItemCode)->get('OITM');
-
-    if($rs->num_rows() === 1)
-    {
-      return $rs->row()->ItemName;
-    }
-
-    return NULL;
-  }
-
-
-  public function getItemStock($ItemCode, $WhsCode = NULL)
-  {
-    $WhsCode = empty($WhsCode) ? getConfig('DEFAULT_WAREHOUSE') : $WhsCode;
-
-    $rs = $this->ms
-    ->select('ItemCode, WhsCode, OnHand, IsCommited, OnOrder')
-    ->where('ItemCode', $ItemCode)
-    ->where('WhsCode', $WhsCode)
-    ->get('OITW');
-
-    if($rs->num_rows() === 1)
-    {
-      return $rs->row();
-    }
-
-    return NULL;
+    return $this->db->insert('products_sync_logs', $arr);
   }
 
 } //--- end classs

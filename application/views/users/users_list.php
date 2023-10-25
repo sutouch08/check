@@ -56,14 +56,14 @@
 
 <div class="row">
 	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 table-responsive">
-		<table class="table table-striped table-bordered" style="min-width:1120px;">
+		<table class="table table-striped table-bordered" style="min-width:870px;">
 			<thead>
 				<tr>
 					<th class="fix-width-100"></th>
 					<th class="fix-width-60 middle text-center">#</th>
-					<th class="fix-width-100 middle">Username</th>
-					<th class="fix-width-150 middle">Display name</th>
-					<th class="fix-width-100 middle ">Profile</th>
+					<th class="fix-width-150 middle">Username</th>
+					<th class="fix-width-200 middle">Display name</th>
+					<th class="fix-width-150 middle ">Profile</th>
 					<th class="fix-width-60 middle text-center">Status</th>
 					<th class="fix-width-150 middle">Create at</th>
 					<th class="min-width-150 middle">Update at</th>

@@ -30,45 +30,6 @@
 		<div class="col-xs-12 col-sm-reset inline red" id="dname-error"></div>
   </div>
 
-	<div class="form-group">
-  	<label class="col-lg-3 col-md-3 col-sm-3 col-xs-6 control-label">Employee</label>
-    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-			<select class="width-100" id="emp_id">
-				<option value="">-No Employee-</option>
-				<?php echo select_employee($user->emp_id); ?>
-      </select>
-    </div>
-  </div>
-
-	<div class="form-group">
-  	<label class="col-lg-3 col-md-3 col-sm-3 col-xs-6 control-label">Sales Employee</label>
-    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-			<select class="width-100" id="sale_id">
-			<?php echo select_saleman($user->sale_id); ?>
-      </select>
-    </div>
-  </div>
-
-	<div class="form-group">
-  	<label class="col-lg-3 col-md-3 col-sm-3 col-xs-6 control-label">Sales Team</label>
-    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-			<select class="width-100" id="team_id">				
-			<?php echo select_sales_team($user->team_id); ?>
-      </select>
-    </div>
-  </div>
-
-
-  <div class="form-group">
-    <label class="col-lg-3 col-md-3 col-sm-3 col-xs-12 control-label">User Group</label>
-    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-			<select class="form-control" id="group_id">
-        <?php echo select_user_group($user->group_id); ?>
-      </select>
-    </div>
-	</div>
-
-
   <div class="form-group">
     <label class="col-lg-3 col-md-3 col-sm-3 col-xs-12 control-label">Permission Profile</label>
     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
@@ -106,10 +67,5 @@
 	<input type="hidden" id="user_id" value="<?php echo $user->id; ?>">
 </form>
 
-
-<script>
-	$('#emp_id').select2();
-	$('#sale_id').select2();
-</script>
 <script src="<?php echo base_url(); ?>scripts/users/users.js?v=<?php echo date('Ymd'); ?>"></script>
 <?php $this->load->view('include/footer'); ?>

@@ -66,11 +66,6 @@ class Users extends PS_Controller{
 			{
 				$uname = trim($this->input->post('uname'));
 				$dname = trim($this->input->post('dname'));
-				$sale_id = $this->input->post('sale_id');
-				$emp_id = get_null($this->input->post('emp_id'));
-				$group_id = $this->input->post('group_id');
-				$team_id = get_null($this->input->post('team_id'));
-				$level = $this->input->post('level');
 				$pwd = $this->input->post('pwd');
 				$id_profile = get_null($this->input->post('profile'));
 				$active = $this->input->post('active') == 1 ? 1 : 0;
@@ -87,11 +82,6 @@ class Users extends PS_Controller{
 							'uid' => md5($uname),
 							'id_profile' => $id_profile,
 							'active' => $active,
-							'sale_id' => $sale_id,
-							'emp_id' => $emp_id,
-							'group_id' => $group_id,
-							'team_id' => $team_id,
-							'level' => $level,
 							'last_pass_change' => date('Y-m-d'),
 							'force_reset' => $force_reset
 						);
@@ -171,11 +161,6 @@ class Users extends PS_Controller{
 				$id = $this->input->post('id');
 				$uname = $this->input->post('uname');
 				$dname = trim($this->input->post('dname'));
-				$sale_id = $this->input->post('sale_id');
-				$emp_id = get_null($this->input->post('emp_id'));
-				$group_id = get_null($this->input->post('group_id'));
-				$team_id = get_null($this->input->post('team_id'));
-				$level = $this->input->post('level');
 				$id_profile = get_null($this->input->post('profile'));
 				$active = $this->input->post('active') == 1 ? 1 : 0;
 
@@ -184,12 +169,7 @@ class Users extends PS_Controller{
 					$arr = array(
 						'name' => $dname,
 						'id_profile' => $id_profile,
-						'active' => $active,
-						'sale_id' => $sale_id,
-						'emp_id' => $emp_id,
-						'group_id' => $group_id,
-						'team_id' => $team_id,
-						'level' => $level
+						'active' => $active
 					);
 
 					if( ! $this->user_model->update($id, $arr))
@@ -256,19 +236,11 @@ class Users extends PS_Controller{
 
 			if( ! empty($id))
 			{
-				if( ! $this->user_model->has_transection($id))
-				{
-					if( ! $this->user_model->delete($id))
-					{
-						$sc = FALSE;
-						set_error('delete');
-					}
-				}
-				else
+				if( ! $this->user_model->delete($id))
 				{
 					$sc = FALSE;
-					$this->error = "Delete failed because completed transection exists OR link to another module.";
-				}
+					set_error('delete');
+				}				
 			}
 			else
 			{

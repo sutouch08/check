@@ -38,41 +38,15 @@
   </div>
 
 	<div class="form-group">
-  	<label class="col-lg-3 col-md-3 col-sm-3 col-xs-6 control-label">Employee</label>
+    <label class="col-lg-3 col-md-3 col-sm-3 col-xs-12 control-label">Permission Profile</label>
     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-			<select class="width-100" id="emp_id">
-				<option value="">-No Employee-</option>
-				<?php echo select_employee(); ?>
+			<select class="form-control" name="profile" id="profile">
+        <option value="">Please Select</option>
+        <?php echo select_profile(); ?>
       </select>
     </div>
+		<div class="col-xs-12 col-sm-reset inline red" id="profile-error"></div>
   </div>
-
-	<div class="form-group">
-  	<label class="col-lg-3 col-md-3 col-sm-3 col-xs-6 control-label">Sales Employee</label>
-    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-			<select class="width-100" id="sale_id">
-			<?php echo select_saleman(); ?>
-      </select>
-    </div>
-  </div>
-
-	<div class="form-group">
-  	<label class="col-lg-3 col-md-3 col-sm-3 col-xs-6 control-label">Sales Team</label>
-    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-			<select class="width-100" id="team_id">				
-			<?php echo select_sales_team(); ?>
-      </select>
-    </div>
-  </div>
-
-	<div class="form-group">
-    <label class="col-lg-3 col-md-3 col-sm-3 col-xs-12 control-label">User Group</label>
-    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-			<select class="form-control" id="group_id">
-        <?php echo select_user_group(); ?>
-      </select>
-    </div>
-	</div>
 
 	<div class="divider"></div>
 
@@ -98,16 +72,7 @@
     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 red" id="cm-pwd-error"></div>
   </div>
 
-  <div class="form-group">
-    <label class="col-lg-3 col-md-3 col-sm-3 col-xs-12 control-label">Permission Profile</label>
-    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-			<select class="form-control" name="profile" id="profile">
-        <option value="">Please Select</option>
-        <?php echo select_profile(); ?>
-      </select>
-    </div>
-		<div class="col-xs-12 col-sm-reset inline red" id="profile-error"></div>
-  </div>
+
 
 
 	<div class="form-group">
@@ -142,10 +107,5 @@
     </div>
   </div>
 </form>
-
-<script>
-	$('#emp_id').select2();
-	$('#sale_id').select2();
-</script>
 <script src="<?php echo base_url(); ?>scripts/users/users.js?v=<?php echo date('Ymd'); ?>"></script>
 <?php $this->load->view('include/footer'); ?>

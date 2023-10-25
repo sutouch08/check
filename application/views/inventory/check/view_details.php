@@ -1,0 +1,123 @@
+<?php $this->load->view('include/header'); ?>
+<div class="row">
+	<div class="col-lg-4 col-md-4 col-sm-4 hidden-xs padding-5">
+    <h3 class="title"><?php echo $this->title; ?></h3>
+  </div>
+	<div class="col-xs-12 visible-xs">
+		<h3 class="title-xs"><?php echo $this->title; ?></h3>
+	</div>
+	<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 padding-5">
+		<p class="pull-right top-p">
+      <button type="button" class="btn btn-sm btn-warning" onclick="goBack()"><i class="fa fa-arrow-left"></i> &nbsp; Back</button>
+			<button type="button" class="btn btn-sm btn-default" onclick="viewLogs(<?php echo $doc->id; ?>)"><i class="fa fa-history"></i> &nbsp; ประวัติ</button>
+		<?php if($doc->status == 'O' && ($this->pm->can_edit OR $this->pm->can_add)) : ?>
+			<button type="button" class="btn btn-sm btn-primary" onclick="goChecking(<?php echo $doc->id; ?>)">ตรวจนับ</button>
+		<?php endif; ?>
+		<?php if(($doc->status == 'C' || $doc->status == 'D') && ($this->pm->can_delete)) : ?>
+			<button type="button" class="btn btn-sm btn-purple" onclick="reOpenCheck()">ย้อนสถานะ</button>
+		<?php endif; ?>
+		<?php if($doc->status == 'C' && ($this->pm->can_edit OR $this->pm->can_add)) : ?>
+			<button type="button" class="btn btn-sm btn-primary" onclick="getStockZone()">ดึงยอดตั้งต้น</button>
+			<button type="button" class="btn btn-sm btn-success" onclick="exportResult()"><i class="fa fa-file-excel-o"></i> Export</button>
+		<?php endif; ?>
+		</p>
+	</div>
+</div><!-- End Row -->
+<hr class=""/>
+<div class="row">
+	<div class="col-lg-1-harf col-md-1-harf col-sm-2 col-xs-6 padding-5">
+    <label>เลขที่</label>
+    <input type="text" class="form-control input-sm text-center" id="code" value="<?php echo $doc->code; ?>" readonly/>
+  </div>
+  <div class="col-lg-1-harf col-md-1-harf col-sm-2 col-xs-6 padding-5">
+    <label>วันที่</label>
+    <input type="text" class="form-control input-sm text-center" value="<?php echo thai_date($doc->date_add); ?>" readonly/>
+  </div>
+
+  <div class="col-lg-3 col-md-3 col-sm-8 col-xs-6 padding-5">
+    <label>หัวข้อ</label>
+    <input type="text" class="form-control input-sm" name="subject" id="subject" value="<?php echo $doc->subject; ?>" readonly/>
+  </div>
+
+  <div class="col-lg-2 col-md-2 col-sm-3 col-xs-6 padding-5">
+    <label>โซน</label>
+    <input type="text" class="form-control input-sm" name="zone_code" id="zone_code" value="<?php echo $doc->zone_code; ?>" readonly/>
+  </div>
+
+  <div class="col-lg-4 col-md-4 col-sm-9 col-xs-12 padding-5">
+    <label class="not-show">โซน</label>
+    <input type="text" class="form-control input-sm" name="zone_name" id="zone_name" value="<?php echo $doc->zone_name; ?>" readonly/>
+  </div>
+
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding-5">
+    <label>หมายเหตุ</label>
+    <input type="text" class="form-control input-sm" name="remark" id="remark" value="<?php echo $doc->remark; ?>" readonly/>
+  </div>
+	<input type="hidden" id="check_id" value="<?php echo $doc->id; ?>" />
+</div>
+<hr class="margin-top-15 margin-bottom-15">
+<?php if($doc->status == 'D') : ?>
+	<?php $this->load->view('cancle_watermark'); ?>
+<?php endif; ?>
+<div class="row">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 table-responsive">
+		<table class="table table-striped border-1 tableFixHead" style="min-width:1000px;">
+			<thead>
+				<tr class="freez" id="head">
+					<th class="fix-width-80 text-center">#</th>
+					<th class="fix-width-120">บาร์โค้ด</th>
+					<th class="fix-width-200">รหัสสินค้า</th>
+					<th class="min-width-300">ชื่อสินค้า</th>
+					<th class="fix-width-100 text-right">ตั้งต้น (1)</th>
+					<th class="fix-width-100 text-right">ตรวจนับ (2)</th>
+					<th class="fix-width-100 text-right">ยอดต่าง (1-2)</th>
+				</tr>
+			</thead>
+			<tbody>
+				<?php if( ! empty($details)) : ?>
+					<?php $total_stock = 0; ?>
+					<?php $total_check = 0; ?>
+					<?php $total_diff = 0; ?>
+					<?php $no = 1; ?>
+					<?php foreach($details as $rs) : ?>
+						<?php $stock_qty = $doc->status == 'C' ? $rs->stock_qty : 0; ?>
+						<?php $check_qty = $doc->status == 'C' ? $rs->check_qty : $rs->qty; ?>
+						<?php $diff_qty = $doc->status == 'C' ? $rs->diff_qty : 0; ?>
+						<?php $code = $doc->status == 'C' ? $rs->product_code : $rs->code; ?>
+						<?php $name = $doc->status == 'C' ? $rs->product_name : $rs->name; ?>
+					<tr>
+						<td class="text-center"><?php echo number($no); ?></td>
+						<td><?php echo $rs->barcode; ?></td>
+						<td><?php echo $code; ?></td>
+						<td><?php echo $name; ?></td>
+						<td class="text-right"><?php echo number($stock_qty); ?></td>
+						<td class="text-right"><?php echo number($check_qty); ?></td>
+						<td class="text-right"><?php echo number($diff_qty); ?></td>
+					</tr>
+					<?php $total_stock += $stock_qty; ?>
+					<?php $total_check += $check_qty; ?>
+					<?php $total_diff += $diff_qty; ?>
+					<?php $no++; ?>
+				<?php endforeach; ?>
+				<tr>
+					<td colspan="4" class="text-right">รวม</td>
+					<td class="text-right"><?php echo number($total_stock); ?></td>
+					<td class="text-right"><?php echo number($total_check); ?></td>
+					<td class="text-right"><?php echo number($total_diff); ?></td>
+				</tr>
+				<?php endif; ?>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<form id="exportForm" method="post" action="<?php echo $this->home; ?>/export_result">
+	<input type="hidden" name="id" value="<?php echo $doc->id; ?>" />
+	<input type="hidden" name="token" id="token" />
+</form>
+
+<?php $this->load->view('inventory/check/logs_modal'); ?>
+
+<script src="<?php echo base_url(); ?>scripts/inventory/check.js?v=<?php echo date('Ymd'); ?>"></script>
+
+<?php $this->load->view('include/footer'); ?>

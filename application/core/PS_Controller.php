@@ -11,7 +11,7 @@ class PS_Controller extends CI_Controller
   public $_Manager = FALSE;
   public $_User = FALSE;
 	public $ms;
-	public $mc;
+	public $ix;
   public $error;
 
   public function __construct()
@@ -27,7 +27,7 @@ class PS_Controller extends CI_Controller
 		$this->_user = $this->user_model->get_user_by_uid($uid);
 
 		$this->close_system   = getConfig('CLOSE_SYSTEM'); //--- ปิดระบบทั้งหมดหรือไม่
-		$this->_SuperAdmin = $this->_user->id_profile == -987654321 ? TRUE : FALSE;		
+		$this->_SuperAdmin = $this->_user->id_profile == -987654321 ? TRUE : FALSE;
 
     if($this->close_system == 1 && $this->_SuperAdmin === FALSE)
     {
@@ -53,7 +53,7 @@ class PS_Controller extends CI_Controller
       $this->load->view('deny_page');
     }
 
-    $this->ms = $this->load->database('ms', TRUE);
+    // $this->ms = $this->load->database('ms', TRUE);
   }
 
 

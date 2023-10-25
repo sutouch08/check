@@ -43,11 +43,6 @@ function saveAdd() {
 
 	const uname = $('#uname').val();
 	const dname = $('#dname').val();
-	const sale_id = $('#sale_id').val();
-	const emp_id = $('#emp_id').val();
-  const team_id = $('#team_id').val();
-  const group_id = $('#group_id').val();
-  const level = $('#group_id option:selected').data('level');
 	const pwd = $('#pwd').val();
 	const profile = $('#profile').val();
 	const active = $('#active').is(':checked') ? 1 : 0;
@@ -62,11 +57,6 @@ function saveAdd() {
 		data:{
 			'uname' : uname,
 			'dname' : dname,
-			'sale_id' : sale_id,
-      'emp_id' : emp_id,
-      'group_id' : group_id,
-      'team_id' : team_id,
-      'level' : level,
 			'pwd' : pwd,
 			'profile' : profile,
 			'active' : active,
@@ -121,11 +111,6 @@ function update() {
 	const id = $('#user_id').val();
   const uname = $('#uname').val();
 	const dname = $('#dname').val();
-	const sale_id = $('#sale_id').val();
-	const emp_id = $('#emp_id').val();
-  const group_id = $('#group_id').val();
-  const team_id = $('#team_id').val();
-  const level = $('#group_id option:selected').data('level');
 	const profile = $('#profile').val();
 	const active = $('#active').is(':checked') ? 1 : 0;
 
@@ -138,12 +123,7 @@ function update() {
 		data:{
 			'id' : id,
       'uname' : uname,
-			'dname' : dname,
-			'sale_id' : sale_id,
-			'emp_id' : emp_id,
-			'group_id' : group_id,
-      'team_id' : team_id,
-      'level' : level,
+			'dname' : dname,			
 			'profile' : profile,
 			'active' : active
 		},

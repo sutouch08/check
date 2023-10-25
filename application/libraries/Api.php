@@ -2,16 +2,18 @@
 class Api
 {
   private $url;
+  private $api_key = 'adbd64b022fbb54d22e4d59437338740';
   protected $ci;
 	public $error;
   protected $timeout = 0; //-- time out in seconds;
+  private $username = 'api@warrix';
+  private $pwd = 'ZK11o15o15L12s$p0rt';
 
   public function __construct()
   {
 		$this->ci =& get_instance();
 
-
-    $this->url = getConfig('SAP_API_HOST');
+    $this->url = getConfig('IX_API_HOST');
 		if($this->url[-1] != '/')
 		{
 			$this->url .'/';
@@ -19,277 +21,215 @@ class Api
   }
 
 
-  public function exportSQ($code)
-	{
-    $this->ci->load->model('rest/logs_model');
-    $logJson = getConfig('LOGS_JSON') == 1 ? TRUE : FALSE;
-    $testMode = getConfig('TEST') ? TRUE : FALSE;
+  public function countUpdateItems($last_sync)
+  {
+		$arr = array(
+			"date" => $last_sync
+		);
 
-		$sc = TRUE;
-		$order = $this->ci->quotation_model->get($code);
-		$details = $this->ci->quotation_model->get_details($code);
-    $adr = $this->ci->quotation_model->get_quotation_address($code);
+		$url = $this->url .'products/countUpdateItem';
+    $header = array();
+    $header[] = 'Content-Type: application/json';
+    $header[] = 'X-API-KEY: '.$this->api_key;
+		$curl = curl_init();
 
-    $dfWhsCode = getConfig('DEFAULT_WAREHOUSE');
+		curl_setopt($curl, CURLOPT_URL, $url);
+		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
+    curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
+    curl_setopt($curl, CURLOPT_USERPWD, "{$this->username}:{$this->pwd}");
+    curl_setopt($curl, CURLOPT_TIMEOUT, $this->timeout);
+		curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($arr));
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
+		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
+		curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
 
-		if(! empty($order) && ! empty($details))
+		$response = curl_exec($curl);
+
+		curl_close($curl);
+
+		$res = json_decode($response);
+
+		if( ! empty($res) && $res->status)
 		{
-      $ds = array();
-			$sq = array(
-				"WEBNumber" => $order->code,
-				"CardCode" => $order->CardCode,
-				"CardName" => $order->CardName,
-				"SlpCode" => intval($order->SlpCode),
-				"GroupNum" => intval($order->Payment),
-				"DocDate" => $order->DocDate,
-				"DocDueDate" => $order->DocDueDate,
-				"TaxDate" => $order->TextDate,
-        "NumAtCard" => $order->NumAtCard,
-        "CntctCode" => intval($order->CntctCode),
-        "Seires" => 0,
-        "SeriesName" => NULL,
-        "SalesEmployee" => intval($order->SlpCode),
-        "OwnerCode" => intval($order->OwnerCode),
-        "Comments" => $order->Comments,
-        "DiscPrcnt" => round($order->DiscPrcnt, 2),
-        "DiscSum" => round($order->DiscAmount, 2),
-        "DocCur" => $order->DocCur,
-        "DocRate" => round($order->DocRate, 2),
-        "DocTotal" => round($order->DocTotal, 2),
-				"PayToCode" => $order->PayToCode,
-				"ShipToCode" => $order->ShipToCode,
-				"Address" => $order->Address,
-				"Address2" =>$order->Address2,
-				"RoundDif" => round($order->RoundDif, 2),
-        "U_Attn1" => $order->Attn1,
-        "U_Attn2" => $order->Attn2,
-        "U_SQ_TYPE" => $order->Type,
-        "U_SA_PROJECT" => $order->Project,
-        "ShipTo" => array(),
-        "BillTo" => array()
-			);
-
-      if(!empty($adr))
-      {
-        $billTo = array(
-          "Street_B" => $adr->bStreet,
-          "Address2_B" => $adr->bAddress,
-          "Address3_B" => $adr->bAddress2,
-          "Block_B" => $adr->bBlock,
-          "ZipCode_B" => $adr->bZipCode,
-          "County_B" => $adr->bCounty,
-          "Country_B" => $adr->bCountry,
-          "City_B" => $adr->bCity
-        );
-
-        array_push($sq['BillTo'], $billTo);
-
-        $shipTo = array(
-          "Street_S" => $adr->sStreet,
-          "Address2_S" => $adr->sAddress,
-          "Address3_S" => $adr->sAddress2,
-          "Block_S" => $adr->sBlock,
-          "ZipCode_S" => $adr->sZipCode,
-          "County_S" => $adr->sCounty,
-          "Country_S" => $adr->sCountry,
-          "City_S" => $adr->sCity
-        );
-
-        array_push($sq['ShipTo'], $shipTo);
-      }
-
-			$orderLine = array();
-
-			foreach($details AS $rs)
-			{
-				$line = array(
-					"LineNum" => intval($rs->LineNum),
-					"ItemCode" => $rs->ItemCode,
-					"ItemDescription" => $rs->ItemName,
-          "ItemDetails" => $rs->Description,
-          "Text" => $rs->Description,
-          "FreeText" => NULL,
-					"Quantity" => round($rs->Qty, 2),
-					//"UomEntry" => intval($rs->UomEntry),
-          "UnitPrice" => round($rs->Price, 2),
-          "DiscPrcnt" => round($rs->DiscPrcnt, 2),
-          "VatGroup" => $rs->VatGroup,
-          "ShipDate" => NULL,
-          "UomCode" => intval($rs->UomEntry),
-          "OcrCode" => NULL,
-          "AcctCode" => NULL,
-          "WhsCode" => empty($rs->WhsCode) ? $dfWhsCode : $rs->WhsCode,
-					"LineTotal" => round($rs->LineTotal, 2),
-					"PriceBefDi" => round($rs->Price, 2),
-					"Currency" => $order->DocCur,
-					"Rate" => round($order->DocRate, 2),
-					"VatPrcnt" => round($rs->VatRate, 2),
-					"PriceAfVAT" => round(add_vat($rs->SellPrice, $rs->VatRate), 2),
-					"VatSum" => round($rs->totalVatAmount, 2),
-					"SlpCode" => intval($order->SlpCode),
-          "NoInvTryMv" => NULL,
-          "CoGsOcrCode" => NULL,
-          "TreeType" => $rs->TreeType,
-          "Text" => $rs->LineText
-				);
-
-				array_push($orderLine, $line);
-			}
-
-			$sq['Line'] = $orderLine;
-
-      array_push($ds, $sq);
-
-      if($testMode)
-  		{
-  			$arr = array(
-  				'Status' => 1,
-  				'DocEntry' => 1,
-  				'DocNum' => "22000001"
-  			);
-
-  			$this->ci->quotation_model->update($code, $arr);
-
-        $logs = array(
-          'code' => $code,
-          'status' => 'success',
-          'json' => json_encode($ds)
-        );
-
-        $this->ci->logs_model->order_logs($logs);
-  			return TRUE;
-  		}
-
-      $json = json_encode($ds, JSON_UNESCAPED_UNICODE);
-
-      if($logJson)
-      {
-        $logs = array(
-          'code' => $code,
-          'status' => 'send',
-          'json' => $json
-        );
-
-        $this->ci->logs_model->order_logs($logs);
-      }
-
-
-			$url = getConfig('SAP_API_HOST');
-
-			if($url[-1] != '/')
-			{
-				$url .'/';
-			}
-
-			$url = $url."Quotation";
-
-			$curl = curl_init();
-			curl_setopt($curl, CURLOPT_URL, $url);
-			curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
-      curl_setopt($curl, CURLOPT_TIMEOUT, 60);
-			curl_setopt($curl, CURLOPT_POSTFIELDS, $json);
-			curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
-			curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
-			curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-Type: application/json"));
-
-			$response = curl_exec($curl);
-
-      if($response === FALSE)
-      {
-        $response = curl_error($curl);
-      }
-
-			curl_close($curl);
-
-			$ra = json_decode($response);
-
-			if(! empty($ra) && ! empty($ra[0]->Status))
-			{
-        $rs = $ra[0];
-
-				if($rs->Status == 'success' OR $rs->Status == 'Success')
-				{
-					$arr = array(
-						'Status' => 1,
-						'DocEntry' => $rs->DocEntry,
-						'DocNum' => $rs->DocNum
-					);
-
-					$this->ci->quotation_model->update($code, $arr);
-
-
-          if($logJson)
-					{
-						$logs = array(
-							'code' => $code,
-							'status' => 'success',
-							'json' => $response
-						);
-
-						$this->ci->logs_model->order_logs($logs);
-					}
-				}
-				else
-				{
-          if( ! empty($rs->DocEntry) && ! empty($rs->DocNum))
-          {
-            $arr = array(
-              'Status' => 1,
-              'DocEntry' => $rs->DocEntry,
-              'DocNum' => $rs->DocNum
-            );
-          }
-          else
-          {
-            $arr = array(
-              'Status' => 3,
-              'message' => $rs->errMsg
-            );
-          }
-
-					$this->ci->quotation_model->update($code, $arr);
-
-					$sc = FALSE;
-					$this->ci->error = $rs->errMsg;
-
-          $logs = array(
-            'code' => $code,
-            'status' => 'error',
-            'json' => $response
-          );
-
-          $this->ci->logs_model->order_logs($logs);
-				}
-			}
-			else
-			{
-				$sc = FALSE;
-				$this->error = "Export failed : {$response}";
-
-				$arr = array(
-					'Status' => 3,
-					'message' => $response
-				);
-
-				$this->ci->quotation_model->update($code, $arr);
-
-        $logs = array(
-          'code' => $code,
-          'status' => 'response',
-          'json' => $response
-        );
-
-        $this->ci->logs_model->order_logs($logs);
-			}
+      return $res->count;
 		}
 		else
 		{
-			$sc = FALSE;
-			$this->error = "No data found";
+			$this->error = $response;
+			return FALSE;
 		}
+  }
 
-		return $sc;
+
+
+  public function getUpdateItems($last_sync, $limit = 100, $offset = 0)
+	{
+    $arr = array(
+			"date" => $last_sync,
+      "limit" => $limit,
+      "offset" => $offset
+		);
+
+		$url = $this->url .'products/getUpdateItem';
+    $header = array();
+    $header[] = 'Content-Type: application/json';
+    $header[] = 'X-API-KEY: '.$this->api_key;
+		$curl = curl_init();
+
+		curl_setopt($curl, CURLOPT_URL, $url);
+		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
+    curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
+    curl_setopt($curl, CURLOPT_USERPWD, "{$this->username}:{$this->pwd}");
+    curl_setopt($curl, CURLOPT_TIMEOUT, $this->timeout);
+		curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($arr));
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
+		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
+		curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
+
+		$response = curl_exec($curl);
+
+		curl_close($curl);
+
+		$res = json_decode($response);
+
+		if( ! empty($res) && $res->status)
+		{
+      return $res;
+		}
+		else
+		{
+			$this->error = $response;
+			return FALSE;
+		}
 	}
+
+
+  //-------------------- Shop zone ----------------------------------------//
+  public function countUpdateZone()
+  {
+		// $arr = array(
+		// 	"date" => date('Y-m-d')
+		// );
+
+		$url = $this->url .'zone/countUpdateZone';
+    $header = array();
+    $header[] = 'Content-Type: application/json';
+    $header[] = 'X-API-KEY: '.$this->api_key;
+		$curl = curl_init();
+
+		curl_setopt($curl, CURLOPT_URL, $url);
+		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
+    curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
+    curl_setopt($curl, CURLOPT_USERPWD, "{$this->username}:{$this->pwd}");
+    curl_setopt($curl, CURLOPT_TIMEOUT, $this->timeout);
+		//curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($arr));
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
+		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
+		curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
+
+		$response = curl_exec($curl);
+
+		curl_close($curl);
+
+		$res = json_decode($response);
+
+		if( ! empty($res) && $res->status)
+		{
+      return $res->count;
+		}
+		else
+		{
+			$this->error = $response;
+			return FALSE;
+		}
+  }
+
+  public function getUpdateZone($limit = 100, $offset = 0)
+	{
+    $arr = array(
+      "limit" => $limit,
+      "offset" => $offset
+		);
+
+		$url = $this->url .'zone/getUpdateZone';
+    $header = array();
+    $header[] = 'Content-Type: application/json';
+    $header[] = 'X-API-KEY: '.$this->api_key;
+		$curl = curl_init();
+
+		curl_setopt($curl, CURLOPT_URL, $url);
+		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
+    curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
+    curl_setopt($curl, CURLOPT_USERPWD, "{$this->username}:{$this->pwd}");
+    curl_setopt($curl, CURLOPT_TIMEOUT, $this->timeout);
+		curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($arr));
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
+		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
+		curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
+
+		$response = curl_exec($curl);
+
+		curl_close($curl);
+
+		$res = json_decode($response);
+
+		if( ! empty($res) && $res->status)
+		{
+      return $res;
+		}
+		else
+		{
+			$this->error = $response;
+			return FALSE;
+		}
+	}
+
+  public function getStockZone($zone_code)
+  {
+    $arr = array(
+      "zone_code" => $zone_code
+		);
+
+		$url = $this->url .'stock_zone/getStockZone';
+    $header = array();
+    $header[] = 'Content-Type: application/json';
+    $header[] = 'X-API-KEY: '.$this->api_key;
+		$curl = curl_init();
+
+		curl_setopt($curl, CURLOPT_URL, $url);
+		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
+    curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
+    curl_setopt($curl, CURLOPT_USERPWD, "{$this->username}:{$this->pwd}");
+    curl_setopt($curl, CURLOPT_TIMEOUT, $this->timeout);
+		curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($arr));
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
+		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
+		curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
+
+		$response = curl_exec($curl);
+
+		curl_close($curl);
+
+		$res = json_decode($response);
+
+		if( ! empty($res))
+		{
+      if($res->status)
+      {
+        return $res->data;
+      }
+      else
+      {
+        $this->error = $res->error;
+        return false;
+      }
+		}
+		else
+		{
+			$this->error = $response;
+			return FALSE;
+		}
+  }
 
 } //-- end class
 

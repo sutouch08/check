@@ -44,18 +44,10 @@ class Authentication extends CI_Controller
 						'id_profile' => $rs->id_profile
 					);
 
-					if( $this->create_user_data($ds, $rem))
+					if( ! $this->create_user_data($ds, $rem))
 					{
-						$arr = array(
-							'user_id' => $rs->id,
-							'uname' => $rs->uname,
-							'docType' => NULL,
-							'docNum' => NULL,
-							'action' => 'login',
-							'ip_address' => $_SERVER['REMOTE_ADDR']
-						);
-
-						$this->user_model->add_logs($arr);
+						$sc = FALSE;
+						$this->error = "Cannot create user data";
 					}
 				}
 			}
