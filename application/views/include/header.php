@@ -12,7 +12,7 @@
 		<title><?php echo $this->title; ?></title>
 		<meta name="description" content="" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-		<link rel="shortcut icon" href="<?php echo base_url(); ?>assets/img/favicon.png">
+		<link rel="shortcut icon" href="<?php echo base_url(); ?>assets/img/favicon.ico">
 		<?php $this->load->view('include/header_include'); ?>
 
 		<style>

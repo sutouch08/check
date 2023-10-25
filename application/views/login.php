@@ -6,7 +6,7 @@
 		<title>Login Page - <?php echo getConfig('COMPANY_NAME'); ?></title>
 		<meta name="description" content="User login page" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-		<link rel="shortcut icon" href="<?php echo base_url(); ?>assets/img/favicon.png">
+		<link rel="shortcut icon" href="<?php echo base_url(); ?>assets/img/favicon.ico">
 
 		<link rel="stylesheet" href="<?php echo base_url(); ?>assets/css/bootstrap.css" />
 		<link rel="stylesheet" href="<?php echo base_url(); ?>assets/css/font-awesome.css" />
@@ -29,8 +29,7 @@
 						<div class="login-container">
 							<div class="center">
 								<h1>
-									<span class="orange"><?php echo getConfig('COMPANY_NAME'); ?></span>
-									<span class="white" id="id-text2">Web Sales</span>
+									<span class="white" id="id-text2">ระบบตรวจนับสต็อกฝากขาย</span>
 								</h1>
 								<h4 class="blue" id="id-company-text">&copy; <?php echo getConfig('COMPANY_FULL_NAME');?></h4>
 							</div>
@@ -41,7 +40,7 @@
 								<div id="login-box" class="login-box visible widget-box no-border">
 									<div class="widget-body">
 										<div class="widget-main">
-											<h4 class="header blue lighter bigger">Please Enter Your Information</h4>
+											<h4 class="header blue lighter bigger">กรุณาเข้าสู่ระบบ</h4>
 
 											<div class="space-6"></div>
 
@@ -66,7 +65,7 @@
 													<div class="clearfix">
 
 														<label class="inline">
-															<input type="checkbox" name="remember" class="ace" value="1" />
+															<input type="checkbox" name="remember" id="remember" class="ace" value="1" />
 															<span class="lbl"> Remember Me</span>
 														</label>
 

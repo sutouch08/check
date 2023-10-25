@@ -239,15 +239,15 @@ class Shop extends PS_Controller
               'is_consignment' => empty($rs->is_consignment) ? 0 : 1
             );
 
-            $id = $this->shop_model->get_by_code($rs->code);
+            $zone = $this->shop_model->get_by_code($rs->code);
 
-            if( ! $id)
+            if(empty($zone))
             {
               $this->shop_model->add($arr);
             }
             else
             {
-              $this->shop_model->update_by_id($id, $arr);
+              $this->shop_model->update_by_id($zone->id, $arr);
             }
           }
 

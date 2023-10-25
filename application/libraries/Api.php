@@ -106,11 +106,7 @@ class Api
 
   //-------------------- Shop zone ----------------------------------------//
   public function countUpdateZone()
-  {
-		// $arr = array(
-		// 	"date" => date('Y-m-d')
-		// );
-
+  {		
 		$url = $this->url .'zone/countUpdateZone';
     $header = array();
     $header[] = 'Content-Type: application/json';
