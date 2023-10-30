@@ -769,37 +769,47 @@ class Check extends PS_Controller
     {
       $this->load->library('api');
 
-      $stock = $this->api->getStockZone($doc->zone_code);
+      $result = $this->api->getStockZone($doc->zone_code);
 
-      if( ! empty($stock))
+      if( ! empty($result) OR $result->status)
       {
         if($this->check_model->reset_stock_zone($doc->id))
         {
-          foreach($stock as $rs)
+          $stock = $result->data;
+
+          if( ! empty($stock))
           {
-            $row = $this->check_model->get_result_row_by_product_code($doc->id, $rs->product_code);
-
-            if( ! empty($row))
+            foreach($stock as $rs)
             {
-              $this->check_model->update_stock_zone($row->id, $rs->qty);
-            }
-            else
-            {
-              $arr = array(
-                'check_id' => $doc->id,
-                'barcode' => $rs->barcode,
-                'product_code' => $rs->product_code,
-                'product_name' => $rs->product_name,
-                'cost' => $rs->cost,
-                'price' => $rs->price,
-                'stock_qty' => $rs->qty,
-                'check_qty' => 0,
-                'diff_qty' => $rs->qty,
-                'user_id' => $this->_user->id
-              );
+              $row = $this->check_model->get_result_row_by_product_code($doc->id, $rs->product_code);
 
-              $this->check_model->add_result($arr);
+              if( ! empty($row))
+              {
+                $this->check_model->update_stock_zone($row->id, $rs->qty);
+              }
+              else
+              {
+                $arr = array(
+                  'check_id' => $doc->id,
+                  'barcode' => $rs->barcode,
+                  'product_code' => $rs->product_code,
+                  'product_name' => $rs->product_name,
+                  'cost' => $rs->cost,
+                  'price' => $rs->price,
+                  'stock_qty' => $rs->qty,
+                  'check_qty' => 0,
+                  'diff_qty' => $rs->qty,
+                  'user_id' => $this->_user->id
+                );
+
+                $this->check_model->add_result($arr);
+              }
             }
+          }
+          else
+          {
+            $sc = FALSE;
+            $this->error = "ไม่พบยอดตั้งต้นในโซนที่กำหนด";
           }
 
           $this->check_model->update_result_diff($doc->id);
@@ -855,12 +865,13 @@ class Check extends PS_Controller
     $sheet->getColumnDimension("H")->setAutoSize(true);
     $sheet->getColumnDimension("I")->setAutoSize(true);
     $sheet->getColumnDimension("J")->setAutoSize(true);
+    $sheet->getColumnDimension("K")->setAutoSize(true);
 
     $sheet->setCellValue("A1", "รายงานสรุปผลการตรวจนับสินค้า");
     $sheet->getStyle("A1")->getFont()->setSize(18);
     $sheet->getStyle("A1")->getFont()->setBold(TRUE);
     $sheet->getStyle("A1")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-    $sheet->mergeCells("A1:J1");
+    $sheet->mergeCells("A1:K1");
 
     $doc = $this->check_model->get_by_id($id);
 
@@ -868,19 +879,19 @@ class Check extends PS_Controller
     {
       $sheet->setCellValue("A2", "เลขที่");
       $sheet->setCellValue("B2", $doc->code);
-      $sheet->mergeCells("B2:J2");
+      $sheet->mergeCells("B2:K2");
 
       $sheet->setCellValue("A3", "หัวข้อ");
       $sheet->setCellValue("B3", $doc->subject);
-      $sheet->mergeCells("B3:J3");
+      $sheet->mergeCells("B3:K3");
 
       $sheet->setCellValue("A4", "สถานที่");
       $sheet->setCellValue("B4", $doc->zone_code." : ".$doc->zone_name);
-      $sheet->mergeCells("B4:J4");
+      $sheet->mergeCells("B4:K4");
 
       $sheet->setCellValue("A5", "วันที่");
       $sheet->setCellValue("B5", thai_date($doc->start_date, FALSE, "/")." - ".thai_date($doc->end_date, FALSE, "/"));
-      $sheet->mergeCells("B5:J5");
+      $sheet->mergeCells("B5:K5");
 
       $sheet->getStyle("A2")->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_BLUE);
       $sheet->getStyle("A3")->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_BLUE);
@@ -898,8 +909,9 @@ class Check extends PS_Controller
   		$sheet->setCellValue("G{$row}", "ยอดตั้งต้น (1)");
   		$sheet->setCellValue("H{$row}", "ยอดตรวจนับ (2)");
   		$sheet->setCellValue("I{$row}", "ยอดต่าง (1-2)");
-  		$sheet->setCellValue("J{$row}", "มูลค่าต่าง");
-      $sheet->getStyle("A{$row}:J{$row}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+  		$sheet->setCellValue("J{$row}", "มูลค่าต่าง (ทุน)");
+      $sheet->setCellValue("K{$row}", "มูลค่าต่าง (ขาย)");
+      $sheet->getStyle("A{$row}:K{$row}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 
   		$row++;
 
@@ -921,6 +933,7 @@ class Check extends PS_Controller
       		$sheet->setCellValue("H{$row}", $rs->check_qty);
       		$sheet->setCellValue("I{$row}", $rs->diff_qty);
       		$sheet->setCellValue("J{$row}", "=E{$row} * I{$row}");
+          $sheet->setCellValue("K{$row}", "=F{$row} * I{$row}");
           $row++;
           $no++;
         }
@@ -932,11 +945,12 @@ class Check extends PS_Controller
         $sheet->setCellValue("H{$row}", "=SUM(H8:H{$re})");
         $sheet->setCellValue("I{$row}", "=SUM(I8:I{$re})");
         $sheet->setCellValue("J{$row}", "=SUM(J8:J{$re})");
+        $sheet->setCellValue("K{$row}", "=SUM(K8:K{$re})");
 
         $sheet->mergeCells("A{$row}:F{$row}");
         $sheet->getStyle("A{$row}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
         $sheet->getRowDimension($row)->setRowHeight(30);
-        $sheet->getStyle("A{$row}:J{$row}")->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_DOUBLE);
+        $sheet->getStyle("A{$row}:K{$row}")->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_DOUBLE);
 
     		///  กำหนดรูปแบบ column  บาร์โค้ด ให้เป็น number ไม่มีจุดทศนิยม ไม่มีลูกน้ำขั้นหลักพัน
     		$sheet->getStyle("B8:B{$row}")->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER);
@@ -949,6 +963,7 @@ class Check extends PS_Controller
         $sheet->getStyle("H8:H{$row}")->getNumberFormat()->setFormatCode('#,##0');
         $sheet->getStyle("I8:I{$row}")->getNumberFormat()->setFormatCode('#,##0');
         $sheet->getStyle("J8:J{$row}")->getNumberFormat()->setFormatCode('#,##0.00');
+        $sheet->getStyle("K8:K{$row}")->getNumberFormat()->setFormatCode('#,##0.00');
       }
     }
     else

@@ -60,10 +60,10 @@
 	<?php $this->load->view('cancle_watermark'); ?>
 <?php endif; ?>
 <div class="row">
-	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 table-responsive">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 divFixHead" style="height:450px;">
 		<table class="table table-striped border-1 tableFixHead" style="min-width:1000px;">
 			<thead>
-				<tr class="freez" id="head">
+				<tr class="freez">
 					<th class="fix-width-80 text-center">#</th>
 					<th class="fix-width-120">บาร์โค้ด</th>
 					<th class="fix-width-200">รหัสสินค้า</th>
@@ -74,11 +74,12 @@
 				</tr>
 			</thead>
 			<tbody>
+				<?php $total_stock = 0; ?>
+				<?php $total_check = 0; ?>
+				<?php $total_diff = 0; ?>
+				<?php $no = 1; ?>
+
 				<?php if( ! empty($details)) : ?>
-					<?php $total_stock = 0; ?>
-					<?php $total_check = 0; ?>
-					<?php $total_diff = 0; ?>
-					<?php $no = 1; ?>
 					<?php foreach($details as $rs) : ?>
 						<?php $stock_qty = $doc->status == 'C' ? $rs->stock_qty : 0; ?>
 						<?php $check_qty = $doc->status == 'C' ? $rs->check_qty : $rs->qty; ?>
@@ -99,14 +100,16 @@
 					<?php $total_diff += $diff_qty; ?>
 					<?php $no++; ?>
 				<?php endforeach; ?>
+				<?php endif; ?>
+			</tbody>
+			<tfoot>
 				<tr>
-					<td colspan="4" class="text-right">รวม</td>
+					<td colspan="4" class="text-right"><span style="margin-right:10px;">รวม</span>  <?php echo ($no - 1); ?> <span style="margin-left:10px;">รายการ</span></td>
 					<td class="text-right"><?php echo number($total_stock); ?></td>
 					<td class="text-right"><?php echo number($total_check); ?></td>
 					<td class="text-right"><?php echo number($total_diff); ?></td>
 				</tr>
-				<?php endif; ?>
-			</tbody>
+			</tfoot>
 		</table>
 	</div>
 </div>

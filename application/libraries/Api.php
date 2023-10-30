@@ -106,7 +106,7 @@ class Api
 
   //-------------------- Shop zone ----------------------------------------//
   public function countUpdateZone()
-  {		
+  {
 		$url = $this->url .'zone/countUpdateZone';
     $header = array();
     $header[] = 'Content-Type: application/json';
@@ -212,7 +212,7 @@ class Api
 		{
       if($res->status)
       {
-        return $res->data;
+        return $res;
       }
       else
       {

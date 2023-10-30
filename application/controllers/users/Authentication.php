@@ -74,7 +74,7 @@ class Authentication extends CI_Controller
     {
       $times = intval(86400); //-- 1 days
 
-			$times = $remember ? $time * 30 : $times;
+			$times = $remember ? $times * 30 : $times;
 
       foreach($ds as $key => $val)
       {

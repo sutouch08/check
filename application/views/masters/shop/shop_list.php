@@ -9,7 +9,7 @@
 	<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 padding-5">
 		<p class="pull-right top-p">
 			<?php if($this->pm->can_add) : ?>
-				<button type="button" class="btn btn-xs btn-success top-btn" onclick="addNew()"><i class="fa fa-plus"></i> &nbsp; เพิ่มใหม่</button>
+				<!--<button type="button" class="btn btn-xs btn-success top-btn" onclick="addNew()"><i class="fa fa-plus"></i> &nbsp; เพิ่มใหม่</button>-->
         <button type="button" class="btn btn-xs btn-info btn-100 top-btn" onclick="preSync('update')"><i class="fa fa-refresh"></i> &nbsp; Sync</button>
 			<?php endif; ?>
 		</p>

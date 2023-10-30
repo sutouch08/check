@@ -56,7 +56,7 @@
 
 <div class="row">
 	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 table-responsive">
-		<table class="table table-striped table-bordered" style="min-width:870px;">
+		<table class="table table-striped table-bordered" style="min-width:960px;">
 			<thead>
 				<tr>
 					<th class="fix-width-100"></th>

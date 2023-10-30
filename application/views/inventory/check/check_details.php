@@ -1,36 +1,4 @@
 <style>
-.freez > th {
-  top:0;
-  position: sticky;
-  background-color: white;
-  outline:none;
-  height: 30px;
-  border-bottom: 0 !important;
-}
-
-.tableFixHead {
-  width: 100%;
-  table-layout: fixed;
-  margin-right:0px;
-  margin-bottom: 0;
-  border-top:0 !important;
-}
-
-.tableFixHead thead th {
-  position: sticky;
-  top: -1px;
-  background: #eee;
-}
-
-.tableFixHead tr:first-child {
-  top: -1px;
-}
-
-/*
-.tableFixHead tr > td {
-  padding: 3px !important;
-}
-*/
 .check-title {
   background-color: #f8f8f8;
   border: solid 1px #CCC;
