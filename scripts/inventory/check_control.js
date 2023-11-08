@@ -78,6 +78,127 @@ function doChecking() {
             }
           }
           else {
+            if(ds.item_code == "not_found") {
+              beep();
+              swal({
+                title:'ไม่พบรายการสินค้า',
+                text:"ต้องการบันทึกรายการตรวจนับนี้หรือไม่ ?",
+                type:"warning",
+                showCancelButton:true,
+                confirmButtonColor:'#cf4f27',
+                confirmButtonText:'ดำเนินการต่อ',
+                cancelButtonText:'กลับไปแก้ไข',
+                closeOnConfirm:true
+              },
+              function(isConfirm) {
+                if(isConfirm) {
+                  checkWithNoItem(id, barcode, qty);
+                }
+                else {
+                  activeControl(1);
+                }
+              });
+            }
+            else {
+              swal({
+                title:'Error!',
+                text:ds.message,
+                type:'error'
+              });
+
+              activeControl();
+            }
+          }
+        }
+        else {
+          swal({
+            title:'Error!',
+            text:rs,
+            type:'error'
+          });
+          activeControl();
+        }
+      }
+    })
+  }
+}
+
+
+function checkWithNoItem(id, barcode, qty) {
+  if(barcode.length) {
+
+    inactiveControl();
+
+    $.ajax({
+      url:HOME + 'check_with_no_item',
+      type:'POST',
+      cache:false,
+      data:{
+        'check_id' : id,
+        'barcode' : barcode,
+        'qty' : qty
+      },
+      success:function(rs) {
+        if(isJson(rs)) {
+          let ds = JSON.parse(rs);
+          if(ds.status == 'success') {
+
+            let source = $('#check-template').html();
+            let data = ds.row;
+            let output = $('#check-table');
+
+            render_prepend(source, data, output);
+
+            if($('#'+ds.bc_id).length) {
+              let checkedQty = parseDefault(parseInt(removeCommas($('#'+ds.bc_id).text())), 1);
+              let newQty = checkedQty + qty;
+              $('#'+ds.bc_id).text(addCommas(newQty));
+              $('#row-'+ds.bc_id).insertAfter($('#head'));
+
+              activeControl();
+            }
+            else {
+              $.ajax({
+                url:HOME + 'get_checked_row',
+                type:'GET',
+                cache:false,
+                data:{
+                  'check_id' : id,
+                  'barcode' : barcode
+                },
+                success:function(rd) {
+                  if(isJson(rd)) {
+                    let ds = JSON.parse(rd);
+
+                    if(ds.status == 'success') {
+                      let source = $('#checked-template').html();
+                      let data = ds.row;
+                      let output = $('#head');
+
+                      render_after(source, data, output);
+                    }
+                    else {
+                      swal({
+                        title:'Error!',
+                        text:ds.message,
+                        type:'error'
+                      });
+                    }
+                  }
+                  else {
+                    swal({
+                      title:"Error!",
+                      type: 'error',
+                      text:rd
+                    });
+                  }
+
+                  activeControl();
+                }
+              })
+            }
+          }
+          else {            
             swal({
               title:'Error!',
               text:ds.message,
@@ -101,15 +222,29 @@ function doChecking() {
 }
 
 
-function activeControl() {
+function activeControl(ok) {
+
   let allow_input_qty = $('#allow_input_qty').val();
 
-  if(allow_input_qty == '1') {
-    $('#qty').val(1).removeAttr('disabled');
-  }
+  if(ok === undefined) {
 
-  $('#btn-check').removeAttr('disabled');
-  $('#barcode').val('').removeAttr('disabled').focus();
+    if(allow_input_qty == '1') {
+      $('#qty').val(1).removeAttr('disabled');
+    }
+
+    $('#btn-check').removeAttr('disabled');
+    $('#barcode').val('').removeAttr('disabled').focus();
+  }
+  else {
+    setTimeout(() => {
+      if(allow_input_qty == '1') {
+        $('#qty').val(1).removeAttr('disabled');
+      }
+
+      $('#btn-check').removeAttr('disabled');
+      $('#barcode').removeAttr('disabled').focus();
+    }, 100)
+  }
 }
 
 function inactiveControl() {

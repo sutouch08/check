@@ -70,7 +70,7 @@
 					<th class="min-width-300">ชื่อสินค้า</th>
 					<th class="fix-width-100 text-right">ตั้งต้น (1)</th>
 					<th class="fix-width-100 text-right">ตรวจนับ (2)</th>
-					<th class="fix-width-100 text-right">ยอดต่าง (1-2)</th>
+					<th class="fix-width-100 text-right">ยอดต่าง (2-1)</th>
 				</tr>
 			</thead>
 			<tbody>

@@ -212,7 +212,7 @@ class Check_model extends CI_Model
 
   public function update_result_diff($check_id)
   {
-    return $this->db->set("diff_qty", "stock_qty - check_qty", FALSE)->where('check_id', $check_id)->update($this->tr);
+    return $this->db->set("diff_qty", "check_qty - stock_qty", FALSE)->where('check_id', $check_id)->update($this->tr);
   }
 
 

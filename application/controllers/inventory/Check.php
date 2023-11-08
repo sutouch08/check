@@ -285,35 +285,97 @@ class Check extends PS_Controller
     $sc = TRUE;
     $this->load->model('masters/products_model');
     $barcode = $this->input->post('barcode');
+    $item_code = "not_found";
+    $bc_id = md5($barcode);
+    $pd = $this->products_model->get_by_barcode($barcode);
 
-    $arr = array(
-      'check_id' => $this->input->post('check_id'),
-      'barcode' => $barcode,
-      'qty' => $this->input->post('qty'),
-      'user_id' => $this->_user->id
-    );
-
-    $id = $this->check_model->add_detail($arr);
-
-    if( ! $id)
+    if( ! empty($pd))
     {
-      $sc = FALSE;
-      $this->error = "เพิ่มรายการไม่สำเร็จ";
+      $item_code = $pd->code;
+
+      $arr = array(
+        'check_id' => $this->input->post('check_id'),
+        'barcode' => $barcode,
+        'qty' => $this->input->post('qty'),
+        'user_id' => $this->_user->id
+      );
+
+      $id = $this->check_model->add_detail($arr);
+
+      if( ! $id)
+      {
+        $sc = FALSE;
+        $this->error = "เพิ่มรายการไม่สำเร็จ";
+      }
+      else
+      {
+        $arr['id'] = $id;
+        $arr['code'] = $pd->code;
+        $arr['timestamp'] = date('H:i:s');
+        $arr['bc_id'] = $bc_id;
+      }
     }
     else
     {
-      $pd = $this->products_model->get_by_barcode($barcode);
-      $arr['id'] = $id;
-      $arr['code'] = empty($pd) ? "" : $pd->code;
-      $arr['timestamp'] = date('H:i:s');
-      $arr['bc_id'] = md5($barcode);
+      $sc = FALSE;
+      $this->error = "ไม่พบรายการสินค้า";
     }
 
     $ds = array(
       'status' => $sc === TRUE ? 'success' : 'failed',
+      'item_code' => $item_code,
       'message' => $sc === TRUE ? 'success' : $this->error,
       'row' => $sc === TRUE ? $arr : NULL,
-      'bc_id' => md5($barcode)
+      'bc_id' => $bc_id
+    );
+
+    echo json_encode($ds);
+  }
+
+
+  public function check_with_no_item()
+  {
+    $sc = TRUE;
+    $this->load->model('masters/products_model');
+    $barcode = $this->input->post('barcode');
+    $bc_id = md5($barcode);
+
+    if( ! empty($barcode))
+    {
+      $arr = array(
+        'check_id' => $this->input->post('check_id'),
+        'barcode' => $barcode,
+        'qty' => $this->input->post('qty'),
+        'user_id' => $this->_user->id
+      );
+
+      $id = $this->check_model->add_detail($arr);
+
+      if( ! $id)
+      {
+        $sc = FALSE;
+        $this->error = "เพิ่มรายการไม่สำเร็จ";
+      }
+      else
+      {
+        $arr['id'] = $id;
+        $arr['code'] = "";
+        $arr['timestamp'] = date('H:i:s');
+        $arr['bc_id'] = $bc_id;
+      }
+    }
+    else
+    {
+      $sc = FALSE;
+      $this->error = "ไม่พบรายการสินค้า";
+    }
+
+    $ds = array(
+      'status' => $sc === TRUE ? 'success' : 'failed',
+      'item_code' => "",
+      'message' => $sc === TRUE ? 'success' : $this->error,
+      'row' => $sc === TRUE ? $arr : NULL,
+      'bc_id' => $bc_id
     );
 
     echo json_encode($ds);
@@ -908,7 +970,7 @@ class Check extends PS_Controller
   		$sheet->setCellValue("F{$row}", "ราคาขาย");
   		$sheet->setCellValue("G{$row}", "ยอดตั้งต้น (1)");
   		$sheet->setCellValue("H{$row}", "ยอดตรวจนับ (2)");
-  		$sheet->setCellValue("I{$row}", "ยอดต่าง (1-2)");
+  		$sheet->setCellValue("I{$row}", "ยอดต่าง (2-1)");
   		$sheet->setCellValue("J{$row}", "มูลค่าต่าง (ทุน)");
       $sheet->setCellValue("K{$row}", "มูลค่าต่าง (ขาย)");
       $sheet->getStyle("A{$row}:K{$row}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
@@ -931,7 +993,7 @@ class Check extends PS_Controller
       		$sheet->setCellValue("F{$row}", $rs->price);
       		$sheet->setCellValue("G{$row}", $rs->stock_qty);
       		$sheet->setCellValue("H{$row}", $rs->check_qty);
-      		$sheet->setCellValue("I{$row}", $rs->diff_qty);
+      		$sheet->setCellValue("I{$row}", "=H{$row} - G{$row}");
       		$sheet->setCellValue("J{$row}", "=E{$row} * I{$row}");
           $sheet->setCellValue("K{$row}", "=F{$row} * I{$row}");
           $row++;
