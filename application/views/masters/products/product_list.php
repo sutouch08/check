@@ -9,16 +9,12 @@
 	<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 padding-5">
 		<p class="pull-right top-p">
 			<?php if($this->pm->can_add) : ?>
-				<!--
 				<button type="button" class="btn btn-xs btn-success top-btn" onclick="addNew()"><i class="fa fa-plus"></i> &nbsp; เพิ่มใหม่</button>
-			-->
         <button type="button" class="btn btn-xs btn-info btn-100 top-btn" onclick="preSync('update')"><i class="fa fa-refresh"></i> &nbsp; Sync</button>
   			<button type="button" class="btn btn-xs btn-info btn-100 top-btn" onclick="preSync('all')"><i class="fa fa-refresh"></i> &nbsp; Sync All</button>
 			<?php endif; ?>
-			<!--
 			<button type="button" class="btn btn-xs btn-primary top-btn" onclick="getUploadFile()"><i class="fa fa-file-excel-o"></i> &nbsp; Imoprt</button>
 			<button type="button" class="btn btn-xs btn-purple top-btn" onclick="getTemplate()"><i class="fa fa-download"></i> &nbsp; template</button>
-		-->
 		</p>
 	</div>
 </div><!-- End Row -->
@@ -89,7 +85,7 @@
 			<?php if(!empty($data)) : ?>
 				<?php $no = $this->uri->segment(4) + 1; ?>
 				<?php foreach($data as $rs) : ?>
-					<tr id="row-<?php echo $no; ?>" class="font-size-12">
+					<tr id="row-<?php echo $rs->id; ?>" class="font-size-12">
 						<td class="middle text-center">
 							<?php if($this->pm->can_edit) : ?>
 								<button type="button" class="btn btn-minier btn-warning" onclick="getEdit('<?php echo $rs->id; ?>')">
@@ -97,12 +93,12 @@
 								</button>
 							<?php endif; ?>
 							<?php if($this->pm->can_delete) : ?>
-								<button type="button" class="btn btn-minier btn-danger" onclick="getDelete('<?php echo $rs->id; ?>', <?php echo $no; ?>)">
+								<button type="button" class="btn btn-minier btn-danger" onclick="getDelete('<?php echo $rs->code; ?>', <?php echo $rs->id; ?>)">
 									<i class="fa fa-trash"></i>
 								</button>
 							<?php endif; ?>
 						</td>
-						<td class="middle text-center"><?php echo $no; ?></td>
+						<td class="middle text-center no"><?php echo $no; ?></td>
 						<td class="middle"><?php echo $rs->barcode; ?></td>
 						<td class="middle"><?php echo $rs->code; ?></td>
             <td class="middle"><?php echo $rs->name; ?></td>
@@ -119,7 +115,7 @@
 		</table>
 	</div>
 </div>
-<?php //$this->load->view('masters/product_items/import_items'); ?>
+<?php $this->load->view('masters/products/import_items'); ?>
 <?php $this->load->view('masters/products/sync_modal'); ?>
 
 <script src="<?php echo base_url(); ?>scripts/masters/products.js?v=<?php echo date('Ymd'); ?>"></script>

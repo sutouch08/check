@@ -8,13 +8,7 @@
 	</div>
 	<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 padding-5">
 		<p class="pull-right top-p">
-      <button type="button" class="btn btn-sm btn-warning" onclick="goBack()"><i class="fa fa-arrow-left"></i> &nbsp; Back</button>
-		<?php if($doc->status == 'O' && ($this->pm->can_edit OR $this->pm->can_add)) : ?>
-			<button type="button" class="btn btn-sm btn-primary" onclick="closeCheck()">ปิดการตรวจนับ</button>
-		<?php endif; ?>
-		<?php if($doc->status == 'C' && ($this->pm->can_edit OR $this->pm->can_add)) : ?>
-			<button type="button" class="btn btn-sm btn-purple" onclick="reOpenCheck()">เปิดการตรวจนับ</button>
-		<?php endif; ?>
+      <button type="button" class="btn btn-sm btn-warning" onclick="goBack()"><i class="fa fa-arrow-left"></i> &nbsp; Back</button>		
 		</p>
 	</div>
 </div><!-- End Row -->

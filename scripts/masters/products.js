@@ -169,8 +169,9 @@ function clearFilter(){
 }
 
 
-function getDelete(code, no){
-  let url = BASE_URL + 'masters/items/delete_item/';// + encodeURIComponent(code);
+function getDelete(code, id){
+  let url = BASE_URL + 'masters/products/delete_item/';
+
   swal({
     title:'Are sure ?',
     text:'ต้องการลบ ' + code + ' หรือไม่ ?',
@@ -183,10 +184,10 @@ function getDelete(code, no){
   },function(){
     $.ajax({
       url: url,
-      type:'GET',
+      type:'POST',
       cache:false,
       data:{
-        'code' : code
+        'id' : id
       },
       success:function(rs){
         if(rs === 'success'){
@@ -196,7 +197,10 @@ function getDelete(code, no){
             timer:1000
           });
 
-          $('#row-'+no).remove();
+          $('#row-'+id).remove();
+
+          reIndex();
+
         }else{
           swal({
             title:'Error!',

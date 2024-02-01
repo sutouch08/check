@@ -20,6 +20,9 @@
 			<button type="button" class="btn btn-sm btn-primary" onclick="getStockZone()">ดึงยอดตั้งต้น</button>
 			<button type="button" class="btn btn-sm btn-success" onclick="exportResult()"><i class="fa fa-file-excel-o"></i> Export</button>
 		<?php endif; ?>
+		<?php if($doc->status == 'O' && ($this->pm->can_edit OR $this->pm->can_add)) : ?>
+			<button type="button" class="btn btn-sm btn-purple" onclick="closeCheck()">ปิดการตรวจนับ</button>
+		<?php endif; ?>
 		</p>
 	</div>
 </div><!-- End Row -->
@@ -83,7 +86,7 @@
 					<?php foreach($details as $rs) : ?>
 						<?php $stock_qty = $doc->status == 'C' ? $rs->stock_qty : 0; ?>
 						<?php $check_qty = $doc->status == 'C' ? $rs->check_qty : $rs->qty; ?>
-						<?php $diff_qty = $doc->status == 'C' ? $rs->diff_qty : 0; ?>
+						<?php $diff_qty = $doc->status == 'C' ? $rs->diff_qty : $rs->qty; ?>
 						<?php $code = $doc->status == 'C' ? $rs->product_code : $rs->code; ?>
 						<?php $name = $doc->status == 'C' ? $rs->product_name : $rs->name; ?>
 					<tr>

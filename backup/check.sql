@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 27, 2023 at 04:26 PM
+-- Generation Time: Feb 01, 2024 at 03:58 AM
 -- Server version: 10.1.35-MariaDB
 -- PHP Version: 7.4.29
 
@@ -43,7 +43,9 @@ CREATE TABLE `checks` (
   `allow_input_qty` tinyint(1) NOT NULL DEFAULT '0',
   `date_add` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `user` varchar(50) DEFAULT NULL,
-  `remark` text
+  `remark` text,
+  `last_active` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `active_user` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -86,8 +88,8 @@ CREATE TABLE `check_results` (
   `id` int(11) NOT NULL,
   `check_id` int(11) NOT NULL,
   `barcode` varchar(50) DEFAULT NULL,
-  `product_code` varchar(50) NOT NULL,
-  `product_name` varchar(100) NOT NULL,
+  `product_code` varchar(50) DEFAULT NULL,
+  `product_name` varchar(100) DEFAULT NULL,
   `cost` decimal(12,2) NOT NULL DEFAULT '0.00',
   `price` decimal(12,2) NOT NULL DEFAULT '0.00',
   `stock_qty` int(11) NOT NULL DEFAULT '0',
@@ -131,7 +133,7 @@ INSERT INTO `config` (`code`, `name`, `value`, `group_code`, `description`, `dat
 ('COMPANY_POST_CODE', 'รหัสไปรษณีย์', '', 'Company', '', '2023-10-19 06:03:50'),
 ('COMPANY_TAX_ID', 'เลขที่ผู้เสียภาษี', '', 'Company', '', '2023-10-19 06:03:50'),
 ('COMPANY_WEBSITE', NULL, '', 'Company', '', '2023-10-19 06:03:50'),
-('IX_API_HOST', '', 'https://ix.warrix.co.th/warrix/rest/V1/', 'System', '', '2023-10-20 02:44:35'),
+('IX_API_HOST', '', 'http://localhost/wms/rest/V1/', 'System', '', '2023-12-13 05:50:54'),
 ('LOGS_JSON', NULL, '1', 'System', '', '2023-08-30 05:17:24'),
 ('PREFIX_CHECK', NULL, 'CK', 'Document', '', '2023-10-23 14:03:36'),
 ('RUN_DIGIT_CHECK', 'จำนวนหลัก', '4', 'Document', '', '2023-10-23 14:03:04'),
@@ -298,18 +300,18 @@ INSERT INTO `permission` (`id`, `menu`, `id_profile`, `can_view`, `can_add`, `ca
 (80, 'SCPERM', 6, 1, 1, 1, 1, 0),
 (81, 'SCCONF', 6, 1, 1, 1, 1, 0),
 (82, 'SCACLOG', 6, 1, 1, 1, 1, 0),
-(118, 'ICCHECK', 1, 1, 1, 1, 1, 0),
-(119, 'SCUSER', 1, 1, 1, 1, 1, 0),
-(120, 'SCPERM', 1, 1, 1, 1, 1, 0),
-(121, 'SCCONF', 1, 1, 1, 1, 1, 0),
-(122, 'DBPROD', 1, 1, 1, 1, 1, 0),
-(123, 'DBSHOP', 1, 1, 1, 1, 1, 0),
-(124, 'ICCHECK', 2, 1, 1, 1, 1, 0),
-(125, 'SCUSER', 2, 0, 0, 0, 0, 0),
-(126, 'SCPERM', 2, 0, 0, 0, 0, 0),
-(127, 'SCCONF', 2, 0, 0, 0, 0, 0),
-(128, 'DBPROD', 2, 0, 0, 0, 0, 0),
-(129, 'DBSHOP', 2, 0, 0, 0, 0, 0);
+(136, 'ICCHECK', 1, 1, 1, 1, 1, 0),
+(137, 'SCUSER', 1, 1, 1, 1, 1, 0),
+(138, 'SCPERM', 1, 1, 1, 1, 1, 0),
+(139, 'SCCONF', 1, 1, 1, 1, 1, 0),
+(140, 'DBPROD', 1, 1, 1, 1, 1, 0),
+(141, 'DBSHOP', 1, 1, 1, 1, 1, 0),
+(142, 'ICCHECK', 2, 1, 0, 0, 0, 0),
+(143, 'SCUSER', 2, 0, 0, 0, 0, 0),
+(144, 'SCPERM', 2, 0, 0, 0, 0, 0),
+(145, 'SCCONF', 2, 0, 0, 0, 0, 0),
+(146, 'DBPROD', 2, 0, 0, 0, 0, 0),
+(147, 'DBSHOP', 2, 0, 0, 0, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -451,7 +453,8 @@ CREATE TABLE `user` (
 
 INSERT INTO `user` (`id`, `uname`, `pwd`, `name`, `uid`, `id_profile`, `active`, `date_add`, `date_upd`, `last_pass_change`, `force_reset`) VALUES
 (-1, 'superadmin', '$2y$10$s.Ey6n.SIYRGq5wW.q/sJefuYVOU7pkbnA3X0XEN2ezKiTn11qk6u', 'Super Admin', 'IX1', -987654321, 1, '2019-12-01 21:39:10', NULL, '2024-12-31', 0),
-(1, 'admin', '$2y$10$kKh6iu8t4O6b91OTds9YHeg0sLMW0nDe.VEn9Lb9dNZEvJJtzSTt6', 'Admin', '21232f297a57a5a743894a0e4a801fc3', 1, 1, '2023-10-19 14:16:34', NULL, '2023-10-19', 0);
+(1, 'admin', '$2y$10$kKh6iu8t4O6b91OTds9YHeg0sLMW0nDe.VEn9Lb9dNZEvJJtzSTt6', 'Admin', '21232f297a57a5a743894a0e4a801fc3', 1, 1, '2023-10-19 14:16:34', NULL, '2023-10-19', 0),
+(2, 'user', '$2y$10$qETNie3HGRZEpszWmDFacOVaARnzdP.k./CuND2e5YaobkY7caC/G', 'user', 'ee11cbb19052e40b07aac0ca060c23ee', 2, 1, '2024-01-31 12:31:03', NULL, '2024-01-31', 0);
 
 --
 -- Indexes for dumped tables
@@ -549,10 +552,10 @@ ALTER TABLE `permission`
 --
 ALTER TABLE `products`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `barcode` (`barcode`),
   ADD KEY `name` (`name`),
   ADD KEY `style_code` (`style`),
-  ADD KEY `code` (`code`);
+  ADD KEY `code` (`code`),
+  ADD KEY `barcode` (`barcode`) USING BTREE;
 
 --
 -- Indexes for table `products_sync_logs`
@@ -652,7 +655,7 @@ ALTER TABLE `keys`
 -- AUTO_INCREMENT for table `permission`
 --
 ALTER TABLE `permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=130;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=148;
 
 --
 -- AUTO_INCREMENT for table `products`
@@ -700,7 +703,7 @@ ALTER TABLE `sync_logs`
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Constraints for dumped tables

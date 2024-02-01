@@ -44,6 +44,12 @@ class Products_model extends CI_Model
   }
 
 
+  public function delete_by_id($id)
+  {
+    return $this->db->where('id', $id)->delete($this->tb);
+  }
+  
+
   public function get_by_id($id)
   {
     $rs = $this->db->where('id', $id)->get($this->tb);
@@ -70,9 +76,9 @@ class Products_model extends CI_Model
 
   public function get_by_barcode($barcode)
   {
-    $rs = $this->db->where('barcode', $barcode)->get($this->tb);
+    $rs = $this->db->where('barcode', $barcode)->order_by('id', 'DESC')->limit(1)->get($this->tb);
 
-    if($rs->num_rows() === 1)
+    if($rs->num_rows() > 0)
     {
       return $rs->row();
     }
@@ -83,14 +89,22 @@ class Products_model extends CI_Model
 
   public function get_id_by_barcode($barcode)
   {
-    $rs = $this->db->where('barcode', $barcode)->get($this->tb);
+    $rs = $this->db->where('barcode', $barcode)->order_by('id', 'DESC')->limit(1)->get($this->tb);
 
-    if($rs->num_rows() === 1)
+    if($rs->num_rows() > 0)
     {
       return $rs->row()->id;
     }
 
     return NULL;
+  }
+
+
+  public function is_exists_id($id)
+  {
+    $count = $this->db->where('id', $id)->count_all_results($this->tb);
+
+    return $count > 0 ? TRUE : FALSE;
   }
 
 
@@ -170,7 +184,9 @@ class Products_model extends CI_Model
       $this->db->where('id !=', $id);
     }
 
-    return $this->db->where('barcode', $barcode)->count_all_results($this->tb);
+    $count = $this->db->where('barcode', $barcode)->count_all_results($this->tb);
+
+    return $count > 0 ? TRUE : FALSE;
   }
 
 
@@ -181,7 +197,9 @@ class Products_model extends CI_Model
       $this->db->where('id !=', $id);
     }
 
-    return $this->db->where('code', $code)->count_all_results($this->tb);
+    $count =  $this->db->where('code', $code)->count_all_results($this->tb);
+
+    return $count > 0 ? TRUE : FALSE;
   }
 
 

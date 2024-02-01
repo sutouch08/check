@@ -1,3 +1,36 @@
+var autoFocus = 0;
+var heartBeat = setInterval(function() {renewActiveTime()}, 10000); ///--- ส่ง heartbeat ไปบอก server ว่าเรายังทำงานอยู่นะ
+
+
+window.addEventListener('load', () => {
+  focus_init();
+});
+
+function renewActiveTime() {
+  let id = $('#check_id').val();
+  let url = HOME + 'set_active_time/'+id;
+  $.get(url);
+}
+
+function focus_init() {
+	$('.focus').focusout(function() {
+		autoFocus = 1
+		setTimeout(() => {
+			if(autoFocus == 1) {
+				barcodeFocus();
+			}
+		}, 1000)
+	})
+
+	$('.focus').focusin(function() {
+		autoFocus = 0;
+	});
+}
+
+function barcodeFocus() {
+	$('#barcode').focus();
+}
+
 function doChecking() {
   console.log('doChecking');
   let id = $('#check_id').val();
@@ -198,7 +231,7 @@ function checkWithNoItem(id, barcode, qty) {
               })
             }
           }
-          else {            
+          else {
             swal({
               title:'Error!',
               text:ds.message,
@@ -253,15 +286,41 @@ function inactiveControl() {
   $('#barcode').attr('disabled', 'disabled');
 }
 
+
+$('#qty').focusin(function() {
+  $(this).select();
+});
+
+
+$('#qty').keydown(function(e) {
+  if(e.keyCode == 13 || e.keyCode == 32) {
+    e.preventDefault()
+    $('#barcode').focus()
+  }
+})
+
+$('#barcode').keydown(function(e) {
+  if(e.keyCode === 32) {
+    e.preventDefault()
+    $('#qty').focus()
+  }
+})
+
 $('#barcode').keyup(function(e) {
   if(e.keyCode === 13) {
     let barcode = $(this).val().trim();
 
     if(barcode.length) {
-      doChecking();
+      doChecking()
     }
   }
 });
+
+$('#view-qty').keyup(function(e) {
+  if(e.keyCode === 13) {
+    viewHistory()
+  }
+})
 
 function inputView() {
   $('#view-qty').val(10);
@@ -329,11 +388,17 @@ function clearSheet() {
   $('#barcode').val('').removeAttr('disabled').focus();
 }
 
-$(document).keyup(function(e) {
-  if(e.keyCode == 113)
+$(document).keydown(function(e) {
+  if(e.keyCode == 113) //--- F2
 	{
-		clearSheet();
+    e.preventDefault()
+		clearSheet()
 	}
+  else if(e.keyCode == 114) //--- F3
+  {
+    e.preventDefault()
+    inputView()
+  }
 });
 
 

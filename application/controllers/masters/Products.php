@@ -200,6 +200,28 @@ class Products extends PS_Controller{
     $writer->save('php://output');
   }
 
+	public function delete_item()
+	{
+		$sc = TRUE;
+
+		if($this->pm->can_delete)
+		{
+			$id = $this->input->post('id');
+
+			if( ! $this->products_model->delete_by_id($id))
+			{
+				$sc = FALSE;
+				$this->error = "Delete failed";
+			}
+		}
+		else
+		{
+			$sc = FALSE;
+			set_error('permission');
+		}
+
+		echo $sc === TRUE ? 'success' : $this->error;
+	}
 
   public function count_update_items()
   {
@@ -240,6 +262,7 @@ class Products extends PS_Controller{
 	      foreach($ds->items as $rs)
 	      {
 	        $arr = array(
+						'id' => $rs->id,
 	          'barcode' => $rs->barcode,
 	          'code' => $rs->code,
 	          'name' => $rs->name,
@@ -249,15 +272,14 @@ class Products extends PS_Controller{
 	          'last_sync' => date('Y-m-d H:i:s')
 	        );
 
-	        $id = $this->products_model->get_id_by_barcode($rs->barcode);
 
-	        if( ! $id)
+	        if( ! $this->products_model->is_exists_id($rs->id))
 	        {
 	          $this->products_model->add($arr);
 	        }
 	        else
 	        {
-	          $this->products_model->update_by_id($id, $arr);
+	          $this->products_model->update_by_id($rs->id, $arr);
 	        }
 
 	        $count++;
@@ -317,6 +339,148 @@ class Products extends PS_Controller{
     echo $sc === TRUE ? 'success' : $thsi->error;
   }
 
+
+	public function import_items()
+  {
+    $sc = TRUE;
+		$count = 0;
+		$add = 0;
+		$update = 0;
+		$failed = 0;
+
+    $file = isset( $_FILES['uploadFile'] ) ? $_FILES['uploadFile'] : FALSE;
+  	$path = $this->config->item('upload_path').'items/';
+    $file	= 'uploadFile';
+		$config = array(   // initial config for upload class
+			"allowed_types" => "xlsx",
+			"upload_path" => $path,
+			"file_name"	=> "import_items",
+			"max_size" => 5120,
+			"overwrite" => TRUE
+			);
+
+			$this->load->library("upload", $config);
+
+			if(! $this->upload->do_upload($file))
+      {
+        $sc = FALSE;
+				$this->error = $this->upload->display_errors();
+			}
+      else
+      {
+        $this->load->library('excel');
+
+        $info = $this->upload->data();
+        /// read file
+				$excel = PHPExcel_IOFactory::load($info['full_path']);
+				//get only the Cell Collection
+        $collection	= $excel->getActiveSheet()->toArray(NULL, TRUE, TRUE, TRUE);
+
+        $i = 1;
+
+        $rows = count($collection);
+
+        if($rows > 0)
+        {
+          foreach($collection as $rs)
+          {
+            if($i == 1)
+            {
+              $i++;
+              $headCol = array(
+                'A' => 'บาร์โค้ด',
+                'B' => 'รหัสสินค้า',
+                'C' => 'ชื่อสินค้า',
+                'D' => 'รุ่น',
+                'E' => 'ราคาทุน',
+                'F' => 'ราคาขาย'
+              );
+
+              foreach($headCol as $col => $field)
+              {
+                if($rs[$col] !== $field)
+                {
+                  $sc = FALSE;
+                  $this->error = 'คอลัมภ์ '.$col.' ต้องเป็น '.$field;
+                  break;
+                }
+              }
+
+              if($sc === FALSE)
+              {
+                break;
+              }
+            }
+						else
+						{
+							$count++;
+
+							if( ! empty($rs['A']) && ! empty($rs['B']))
+	            {
+								$arr = array(
+									'barcode' => trim($rs['A']),
+									'code' => trim($rs['B']),
+									'name' => trim($rs['C']),
+									'style' => get_null($rs['D']),
+									'cost' => get_zero($rs['E']),
+									'price' => get_zero($rs['F'])
+								);
+
+								if($this->products_model->add($arr))
+								{
+									$add++;
+								}
+								else
+								{
+									$id = $this->products_model->get_id_by_barcode(trim($rs['A']));
+
+									if($id)
+									{
+										if($this->products_model->update_by_id($id, $arr))
+										{
+											$update++;
+										}
+										else
+										{
+											$sc = FALSE;
+											$this->error .= "{$rs['A']} : {$rs['B']} \r\n";
+											$failed++;
+										}
+									}
+									else
+									{
+										$sc = FALSE;
+										$this->error .= "{$rs['A']} : {$rs['B']} \r\n";
+										$failed++;
+									}
+								}
+	            }
+							else
+							{
+								$sc = FALSE;
+								$failed++;
+							}
+						} //-- endif i > 1
+          } //-- end foreach
+        }
+        else
+        {
+          $sc = FALSE;
+          $this->error = "ไม่พบรายการสินค้า กรุณาตรวจสอบไฟล์";
+        } //-- end if count limit
+      } //--- end if else
+
+		$arr = array(
+			'status' => $sc === TRUE ? 'success' : 'failed',
+			'message' => $sc === TRUE ? 'success' : $this->error,
+			'count' => $count,
+			'add' => $add,
+			'update' => $update,
+			'failed' => $failed
+		);
+
+    echo json_encode($arr);
+  }
 
   public function clear_filter()
   {

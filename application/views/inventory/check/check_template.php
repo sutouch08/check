@@ -5,7 +5,7 @@
       <div class="modal-body">
         <div class="row">
           <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center">
-            <input type="number" class="form-control input-sm input-mini text-center" id="view-qty" value="10" style="margin-left:auto; margin-right:auto;"/>
+            <input type="number" class="form-control input-sm input-mini text-center focus" id="view-qty" value="10" style="margin-left:auto; margin-right:auto;"/>
           </div>
           <div class="divider-hidden"></div>
           <div class="divider-hidden"></div>

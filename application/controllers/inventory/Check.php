@@ -279,6 +279,16 @@ class Check extends PS_Controller
     }
   }
 
+  public function set_active_time($id)
+  {
+    $arr = array(
+      'last_active' => now(),
+      'active_user' => $this->_user->uname
+    );
+
+    return $this->check_model->update($id, $arr);
+  }
+
 
   public function do_checking()
   {
@@ -470,90 +480,100 @@ class Check extends PS_Controller
     {
       if($doc->status == 'O')
       {
+        $last_active = strtotime($doc->last_active) + (5 * 60); //-- เพิ่ม 5 นาที
+        $accept_time = date('Y-m-d H:i:s', $last_active);
 
-        $this->db->trans_begin();
-
-        if( ! $this->check_model->update_details($doc->id, array('status' => 'C')))
+        if($accept_time <= now())
         {
-          $sc = FALSE;
-          $this->error = "ปิดรายการตรวจนับไม่สำเร็จ";
-        }
+          $this->db->trans_begin();
 
-        if($sc === TRUE)
-        {
-          $arr = array(
-            'status' => 'C',
-            'end_date' => now()
-          );
-
-          if( ! $this->check_model->update($doc->id, $arr))
+          if( ! $this->check_model->update_details($doc->id, array('status' => 'C')))
           {
             $sc = FALSE;
-            $this->error = "ปิดการตรวจนับไม่สำเร็จ";
-          }
-        }
-
-        if($sc === TRUE)
-        {
-          if( ! $this->check_model->drop_result($doc->id))
-          {
-            $sc = FALSE;
-            $this->error = "ลบรายการสรุปไม่สำเร็จ";
+            $this->error = "ปิดรายการตรวจนับไม่สำเร็จ";
           }
 
           if($sc === TRUE)
           {
-            //---- gen check result
-            $details = $this->check_model->get_details($doc->id);
+            $arr = array(
+              'status' => 'C',
+              'end_date' => now()
+            );
 
-            if( ! empty($details))
+            if( ! $this->check_model->update($doc->id, $arr))
             {
-              foreach($details as $rs)
-              {
-                if($sc === FALSE)
-                {
-                  break;
-                }
+              $sc = FALSE;
+              $this->error = "ปิดการตรวจนับไม่สำเร็จ";
+            }
+          }
 
-                $arr = array(
+          if($sc === TRUE)
+          {
+            if( ! $this->check_model->drop_result($doc->id))
+            {
+              $sc = FALSE;
+              $this->error = "ลบรายการสรุปไม่สำเร็จ";
+            }
+
+            if($sc === TRUE)
+            {
+              //---- gen check result
+              $details = $this->check_model->get_details($doc->id);
+
+              if( ! empty($details))
+              {
+                foreach($details as $rs)
+                {
+                  if($sc === FALSE)
+                  {
+                    break;
+                  }
+
+                  $arr = array(
                   'check_id' => $doc->id,
                   'barcode' => $rs->barcode,
                   'product_code' => $rs->code,
                   'product_name' => $rs->name,
-                  'cost' => $rs->cost,
-                  'price' => $rs->price,
+                  'cost' => get_zero($rs->cost),
+                  'price' => get_zero($rs->price),
                   'check_qty' => $rs->qty,
                   'user_id' => $this->_user->id
-                );
+                  );
 
-                if( ! $this->check_model->add_result($arr))
-                {
-                  $sc = FALSE;
-                  $this->error = "สร้างรายการสรุปยอดไม่สำเร็จ";
+                  if( ! $this->check_model->add_result($arr))
+                  {
+                    $sc = FALSE;
+                    $this->error = "สร้างรายการสรุปยอดไม่สำเร็จ";
+                  }
                 }
               }
             }
           }
-        }
 
-        if($sc === TRUE)
-        {
-          $arr = array(
+          if($sc === TRUE)
+          {
+            $arr = array(
             'check_id' => $doc->id,
             'action' => 'close',
             'uname' => $this->_user->uname
-          );
+            );
 
-          $this->check_model->add_logs($arr);
-        }
+            $this->check_model->add_logs($arr);
+          }
 
-        if($sc === TRUE)
-        {
-          $this->db->trans_commit();
+          if($sc === TRUE)
+          {
+            $this->db->trans_commit();
+          }
+          else
+          {
+            $this->db->trans_rollback();
+          }
         }
         else
         {
-          $this->db->trans_rollback();
+          $sc = FALSE;
+          $this->error = "ปิดการตรวจนับไม่สำเร็จ เนื่องจากยังมีคนตรวจนับอยู่ กรุณารอ 5 นาทีแล้วลองใหม่อีกครับ";
         }
       }
       else
@@ -986,7 +1006,7 @@ class Check extends PS_Controller
         foreach($results as $rs)
         {
           $sheet->setCellValue("A{$row}", $no);
-          $sheet->setCellValue("B{$row}", $rs->barcode);
+          $sheet->setCellValueExplicit("B{$row}", $rs->barcode, PHPExcel_Cell_DataType::TYPE_STRING);
           $sheet->setCellValue("C{$row}", $rs->product_code);
       		$sheet->setCellValue("D{$row}", $rs->product_name);
       		$sheet->setCellValue("E{$row}", $rs->cost);
@@ -1016,7 +1036,7 @@ class Check extends PS_Controller
 
     		///  กำหนดรูปแบบ column  บาร์โค้ด ให้เป็น number ไม่มีจุดทศนิยม ไม่มีลูกน้ำขั้นหลักพัน
     		$sheet->getStyle("B8:B{$row}")->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER);
-    		$sheet->getStyle("B8:B{$re}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+    		//$sheet->getStyle("B8:B{$re}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 
     		/// ใส่ คอมม่า ให้หลักพัน และเติมทศนิยม
         $sheet->getStyle("E8:E{$row}")->getNumberFormat()->setFormatCode('#,##0.00');

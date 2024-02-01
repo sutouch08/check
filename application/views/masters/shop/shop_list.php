@@ -9,7 +9,7 @@
 	<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 padding-5">
 		<p class="pull-right top-p">
 			<?php if($this->pm->can_add) : ?>
-				<!--<button type="button" class="btn btn-xs btn-success top-btn" onclick="addNew()"><i class="fa fa-plus"></i> &nbsp; เพิ่มใหม่</button>-->
+				<button type="button" class="btn btn-xs btn-success top-btn" onclick="addNew()"><i class="fa fa-plus"></i> &nbsp; เพิ่มใหม่</button>
         <button type="button" class="btn btn-xs btn-info btn-100 top-btn" onclick="preSync('update')"><i class="fa fa-refresh"></i> &nbsp; Sync</button>
 			<?php endif; ?>
 		</p>
@@ -71,14 +71,14 @@
 <?php echo $this->pagination->create_links(); ?>
 <div class="row">
 	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 table-responsive">
-		<table class="table table-striped table-bordered table-hover" style="min-width:1150px;">
+		<table class="table table-striped table-bordered table-hover" style="min-width:960px;">
 			<thead>
 				<tr>
 					<th class="fix-width-80"></th>
-					<th class="fix-width-60 middle text-center">#</th>
+					<th class="fix-width-40 middle text-center">#</th>
 					<th class="fix-width-150 middle text-center">รหัสโซน</th>
 					<th class="min-width-200 middle text-center">ชื่อโซน</th>
-					<th class="fix-width-100 middle text-center">รหัสคลัง</th>
+					<th class="fix-width-80 middle text-center">รหัสคลัง</th>
           <th class="fix-width-200 middle text-center">ชื่อคลัง</th>
           <th class="fix-width-100 middle text-center">ฝากขายเทียม</th>
           <th class="fix-width-100 middle text-center">ใส่จำนวนได้</th>
