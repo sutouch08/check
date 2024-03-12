@@ -66,13 +66,14 @@
 <?php echo $this->pagination->create_links(); ?>
 <div class="row">
 	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 table-responsive">
-		<table class="table table-striped table-bordered table-hover" style="min-width:1290px;">
+		<table class="table table-striped table-bordered table-hover" style="min-width:1490px;">
 			<thead>
 				<tr>
 					<th class="fix-width-80"></th>
 					<th class="fix-width-60 middle text-center">#</th>
 					<th class="fix-width-150 middle text-center">บาร์โค้ด</th>
 					<th class="fix-width-200 middle text-center">รหัสสินค้า</th>
+					<th class="fix-width-200 middle text-center">รหัสเก่า</th>
           <th class="fix-width-300 middle text-center">ชื่อสินค้า</th>
 					<th class="fix-width-150 middle text-center">รุ่น</th>
           <th class="fix-width-100 middle text-center">ทุน</th>
@@ -101,6 +102,7 @@
 						<td class="middle text-center no"><?php echo $no; ?></td>
 						<td class="middle"><?php echo $rs->barcode; ?></td>
 						<td class="middle"><?php echo $rs->code; ?></td>
+						<td class="middle"><?php echo $rs->old_code; ?></td>
             <td class="middle"><?php echo $rs->name; ?></td>
 						<td class="middle"><?php echo $rs->style; ?></td>
             <td class="middle text-right"><?php echo number($rs->cost, 2); ?></td>

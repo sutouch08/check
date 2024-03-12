@@ -86,7 +86,7 @@ class Products_model extends CI_Model
 
     return NULL;
   }
-  
+
 
   public function get_by_barcode($barcode)
   {
@@ -131,7 +131,11 @@ class Products_model extends CI_Model
 
     if( isset($ds['code']) && $ds['code'] != '')
     {
-      $this->db->like('code', $ds['code']);
+      $this->db
+      ->group_start()
+      ->like('code', $ds['code'])
+      ->or_like('old_code', $ds['code'])
+      ->group_end();
     }
 
     if( isset($ds['name']) && $ds['name'] != '')
@@ -162,7 +166,11 @@ class Products_model extends CI_Model
 
     if( isset($ds['code']) && $ds['code'] != '')
     {
-      $this->db->like('code', $ds['code']);
+      $this->db
+      ->group_start()
+      ->like('code', $ds['code'])
+      ->or_like('old_code', $ds['code'])
+      ->group_end();
     }
 
     if( isset($ds['name']) && $ds['name'] != '')
