@@ -299,6 +299,16 @@ class Check extends PS_Controller
     $bc_id = md5($barcode);
     $pd = $this->products_model->get_by_barcode($barcode);
 
+    if(empty($pd))
+    {
+      $pd = $this->products_model->get_by_code($barcode);
+    }
+
+    if(empty($pd))
+    {
+      $pd = $this->products_model->get_by_old_code($barcode);
+    }
+
     if( ! empty($pd))
     {
       $item_code = $pd->code;
@@ -537,7 +547,8 @@ class Check extends PS_Controller
                   'cost' => get_zero($rs->cost),
                   'price' => get_zero($rs->price),
                   'check_qty' => $rs->qty,
-                  'user_id' => $this->_user->id
+                  'user_id' => $this->_user->id,
+                  'old_code' => $rs->old_code
                   );
 
                   if( ! $this->check_model->add_result($arr))
@@ -993,6 +1004,7 @@ class Check extends PS_Controller
   		$sheet->setCellValue("I{$row}", "ยอดต่าง (2-1)");
   		$sheet->setCellValue("J{$row}", "มูลค่าต่าง (ทุน)");
       $sheet->setCellValue("K{$row}", "มูลค่าต่าง (ขาย)");
+      $sheet->setCellValue("L{$row}", "รหัสเก่า");
       $sheet->getStyle("A{$row}:K{$row}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 
   		$row++;
@@ -1016,6 +1028,7 @@ class Check extends PS_Controller
       		$sheet->setCellValue("I{$row}", "=H{$row} - G{$row}");
       		$sheet->setCellValue("J{$row}", "=E{$row} * I{$row}");
           $sheet->setCellValue("K{$row}", "=F{$row} * I{$row}");
+          $sheet->setCellValue("L{$row}", $rs->col_code);
           $row++;
           $no++;
         }

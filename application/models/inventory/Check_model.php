@@ -88,7 +88,7 @@ class Check_model extends CI_Model
   public function get_details($id)
   {
     $rs = $this->db
-    ->select('cd.barcode, pd.code, pd.name, pd.cost, pd.price')
+    ->select('cd.barcode, pd.code, pd.old_code, pd.name, pd.cost, pd.price')
     ->select_sum('cd.qty')
     ->from('check_details AS cd')
     ->join('products AS pd', 'cd.barcode = pd.barcode', 'left')

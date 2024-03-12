@@ -48,7 +48,7 @@ class Products_model extends CI_Model
   {
     return $this->db->where('id', $id)->delete($this->tb);
   }
-  
+
 
   public function get_by_id($id)
   {
@@ -73,6 +73,20 @@ class Products_model extends CI_Model
 
     return NULL;
   }
+
+
+  public function get_by_old_code($code)
+  {
+    $rs = $this->db->where('old_code', $code)->get($this->tb);
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->row();
+    }
+
+    return NULL;
+  }
+  
 
   public function get_by_barcode($barcode)
   {
