@@ -19,7 +19,7 @@ function focus_init() {
 			if(autoFocus == 1) {
 				barcodeFocus();
 			}
-		}, 1000)
+		}, 3000)
 	})
 
 	$('.focus').focusin(function() {
@@ -35,6 +35,8 @@ function doChecking() {
   console.log('doChecking');
   let id = $('#check_id').val();
   let barcode = $('#barcode').val().trim();
+  let pdCode = $('#pd-code').val().trim();
+  barcode = barcode.length == 0 ? pdCode : barcode;
   let qty = parseDefault(parseInt($('#qty').val()), 1);
 
   if(barcode.length) {
@@ -266,6 +268,7 @@ function activeControl(ok) {
     }
 
     $('#btn-check').removeAttr('disabled');
+    $('#pd-code').val('').removeAttr('disabled');
     $('#barcode').val('').removeAttr('disabled').focus();
   }
   else {
@@ -283,6 +286,7 @@ function activeControl(ok) {
 function inactiveControl() {
   $('#qty').attr('disabled', 'disabled');
   $('#btn-check').attr('disabled', 'disabled');
+  $('#pd-code').attr('disabled', 'disabled');
   $('#barcode').attr('disabled', 'disabled');
 }
 
@@ -312,6 +316,18 @@ $('#barcode').keyup(function(e) {
 
     if(barcode.length) {
       doChecking()
+    }
+  }
+});
+
+$('#pd-code').keyup(function(e) {
+  if(e.keyCode === 13) {
+    let pdCode = $(this).val().trim();
+
+    if(pdCode.length) {
+      setTimeout(() => {
+        doChecking();
+      }, 100);
     }
   }
 });
@@ -466,3 +482,12 @@ function removeCheck() {
     });
   }
 }
+
+$('#pd-code').autocomplete({
+  source:BASE_URL + 'auto_complete/get_product_code_and_name',
+  autoFocus:true,
+  close:function() {
+    let arr = $(this).val().split(' | ');
+    $(this).val(arr[0]);
+  }
+})

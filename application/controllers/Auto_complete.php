@@ -35,5 +35,33 @@ class Auto_complete extends CI_Controller
     echo json_encode($sc);
   }
 
+
+  public function get_product_code_and_name()
+  {
+    $txt = trim($_REQUEST['term']);
+    $sc = array();
+
+    $rs = $this->db
+    ->select('code, name')
+    ->like('code', $txt)
+    ->or_like('name', $txt)
+    ->limit(50)
+    ->get('products');
+
+    if($rs->num_rows() > 0)
+    {
+      foreach($rs->result() as $rd)
+      {
+        $sc[] = $rd->code . ' | '.$rd->name;
+      }
+    }
+    else
+    {
+      $sc[] = "not found";
+    }
+
+    echo json_encode($sc);
+  }
+
 } //-- end class
 ?>

@@ -294,17 +294,18 @@ class Check extends PS_Controller
   {
     $sc = TRUE;
     $this->load->model('masters/products_model');
-    $barcode = $this->input->post('barcode');
+    $barcode = $this->input->post('barcode');  
     $item_code = "not_found";
     $bc_id = md5($barcode);
+
     $pd = $this->products_model->get_by_barcode($barcode);
 
-    if(empty($pd))
+    if(empty($pd) && ! empty($barcode))
     {
       $pd = $this->products_model->get_by_code($barcode);
     }
 
-    if(empty($pd))
+    if(empty($pd) && ! empty($barcode))
     {
       $pd = $this->products_model->get_by_old_code($barcode);
     }
