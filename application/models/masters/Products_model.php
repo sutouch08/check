@@ -231,7 +231,7 @@ class Products_model extends CI_Model
 
 		if($rs->num_rows() === 1)
     {
-      return $rs->row()->sync_at === NULL ? date('2019-01-01 00:00:00') : date('Y-m-d h:i:s', strtotime($rs->row()->sync_at));
+      return $rs->row()->sync_at === NULL ? date('2019-01-01 00:00:00') : $rs->row()->sync_at;
     }
 
     return date('2019-01-01 00:00:00');
