@@ -333,7 +333,7 @@ class Check extends PS_Controller
         $arr['id'] = $id;
         $arr['code'] = $pd->code;
         $arr['timestamp'] = date('H:i:s');
-        $arr['bc_id'] = $bc_id
+        $arr['bc_id'] = $bc_id;
       }
     }
     else
