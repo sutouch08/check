@@ -296,7 +296,6 @@ class Check extends PS_Controller
     $this->load->model('masters/products_model');
     $barcode = $this->input->post('barcode');
     $item_code = "not_found";
-    $bc_id = md5($barcode);
 
     $pd = $this->products_model->get_by_barcode($barcode);
 
@@ -330,10 +329,11 @@ class Check extends PS_Controller
       }
       else
       {
+        $bc_id = ! empty($pd->barcode) ? md5($pd->barcode) : md5($barcode);
         $arr['id'] = $id;
         $arr['code'] = $pd->code;
         $arr['timestamp'] = date('H:i:s');
-        $arr['bc_id'] = $bc_id;
+        $arr['bc_id'] = $bc_id
       }
     }
     else
