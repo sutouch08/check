@@ -294,7 +294,7 @@ class Check extends PS_Controller
   {
     $sc = TRUE;
     $this->load->model('masters/products_model');
-    $barcode = $this->input->post('barcode');  
+    $barcode = $this->input->post('barcode');
     $item_code = "not_found";
     $bc_id = md5($barcode);
 
@@ -316,7 +316,7 @@ class Check extends PS_Controller
 
       $arr = array(
         'check_id' => $this->input->post('check_id'),
-        'barcode' => $barcode,
+        'barcode' => ! empty($pd->barcode) ? $pd->barcode : $barcode,
         'qty' => $this->input->post('qty'),
         'user_id' => $this->_user->id
       );
