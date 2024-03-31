@@ -347,7 +347,7 @@ class Check extends PS_Controller
       'item_code' => $item_code,
       'message' => $sc === TRUE ? 'success' : $this->error,
       'row' => $sc === TRUE ? $arr : NULL,
-      'bc_id' => $bc_id
+      'bc_id' => $sc === TRUE ? $bc_id : NULL
     );
 
     echo json_encode($ds);
