@@ -1029,7 +1029,7 @@ class Check extends PS_Controller
       		$sheet->setCellValue("I{$row}", "=H{$row} - G{$row}");
       		$sheet->setCellValue("J{$row}", "=E{$row} * I{$row}");
           $sheet->setCellValue("K{$row}", "=F{$row} * I{$row}");
-          $sheet->setCellValue("L{$row}", $rs->col_code);
+          $sheet->setCellValue("L{$row}", $rs->old_code);
           $row++;
           $no++;
         }
