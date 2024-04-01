@@ -888,11 +888,11 @@ class Check extends PS_Controller
                   'barcode' => $rs->barcode,
                   'product_code' => $rs->product_code,
                   'product_name' => $rs->product_name,
-                  'cost' => $rs->cost,
-                  'price' => $rs->price,
-                  'stock_qty' => $rs->qty,
+                  'cost' => get_zero($rs->cost),
+                  'price' => get_zero($rs->price),
+                  'stock_qty' => get_zero($rs->qty),
                   'check_qty' => 0,
-                  'diff_qty' => $rs->qty,
+                  'diff_qty' => get_zero($rs->qty),
                   'user_id' => $this->_user->id
                 );
 
