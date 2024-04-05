@@ -160,6 +160,17 @@ class Check_model extends CI_Model
   }
 
 
+  public function update_result($id, array $ds = array())
+  {
+    if( ! empty($ds))
+    {
+      return $this->db->where('id', $id)->update($this->tr, $ds);
+    }
+
+    return FALSE;
+  }
+
+
   public function get_result_row_by_product_code($check_id, $product_code)
   {
     $rs = $this->db

@@ -191,6 +191,51 @@ $('#zone_code').autocomplete({
   }
 });
 
+
+function updateCost() {
+  let id = $('#check_id').val();
+
+  load_in();
+
+  $.ajax({
+    url:HOME + 'update_cost/'+id,
+    type:'POST',
+    cache:false,
+    success:function(rs) {
+      load_out();
+      if(rs === 'success') {
+        swal({
+          title:'Success',
+          type:'success',
+          timer:1000
+        });
+
+        setTimeout(() => {
+          window.location.reload();
+        }, 1200);
+      }
+      else {
+        swal({
+          title:'Error!',
+          text:rs,
+          type:'error',
+          html:true
+        })
+      }
+    },
+    error:function(xhr) {
+      load_out();
+      swal({
+        title:'Error!',
+        type:xhr.responseText,
+        type:'error',
+        html:true
+      });
+    }
+  })  
+}
+
+
 function closeCheck() {
   let id = $('#check_id').val();
 

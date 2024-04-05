@@ -481,6 +481,50 @@ class Check extends PS_Controller
   }
 
 
+  public function update_cost($id)
+  {
+    $sc = TRUE;
+    $this->load->model('masters/products_model');
+
+    $doc = $this->check_model->get_by_id($id);
+
+    if( ! empty($doc))
+    {
+      //---- gen check result
+      $details = $this->check_model->get_results($doc->id);
+
+      if( ! empty($details))
+      {
+        foreach($details as $rs)
+        {
+          if( ! empty($rs->product_code))
+          {
+            $item = $this->products_model->get_by_code($rs->product_code);
+
+            if( ! empty($item))
+            {
+              $arr = array(
+                'cost' => $item->cost,
+                'price' => $item->price
+              );
+
+              $this->check_model->update_result($rs->id, $arr);
+            }
+          }
+        }
+      }
+    }
+    else
+    {
+      $sc = FALSE;
+      $this->error = "Invalid document";
+    }
+
+    echo $sc === TRUE ? 'success' : $this->error;
+  }
+
+
+
   public function close_check($id)
   {
     $sc = TRUE;

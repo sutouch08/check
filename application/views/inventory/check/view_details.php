@@ -18,6 +18,7 @@
 		<?php endif; ?>
 		<?php if($doc->status == 'C' && ($this->pm->can_edit OR $this->pm->can_add)) : ?>
 			<button type="button" class="btn btn-sm btn-primary" onclick="getStockZone()">ดึงยอดตั้งต้น</button>
+			<button type="button" class="btn btn-sm btn-primary" onclick="updateCost()">อัพเดตราคา</button>
 			<button type="button" class="btn btn-sm btn-success" onclick="exportResult()"><i class="fa fa-file-excel-o"></i> Export</button>
 		<?php endif; ?>
 		<?php if($doc->status == 'O' && ($this->pm->can_edit OR $this->pm->can_add)) : ?>
