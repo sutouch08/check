@@ -70,18 +70,17 @@ class Api
       "offset" => $offset
 		);
 
+    $json = json_encode($arr);
 		$url = $this->url .'products/getUpdateItem';
     $header = array();
     $header[] = 'Content-Type: application/json';
     $header[] = 'X-API-KEY: '.$this->api_key;
+
 		$curl = curl_init();
 
 		curl_setopt($curl, CURLOPT_URL, $url);
 		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
-    curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
-    curl_setopt($curl, CURLOPT_USERPWD, "{$this->username}:{$this->pwd}");
-    curl_setopt($curl, CURLOPT_TIMEOUT, $this->timeout);
-		curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($arr));
+		curl_setopt($curl, CURLOPT_POSTFIELDS, $json);
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
 		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
 		curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
@@ -115,10 +114,6 @@ class Api
 
 		curl_setopt($curl, CURLOPT_URL, $url);
 		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
-    curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
-    curl_setopt($curl, CURLOPT_USERPWD, "{$this->username}:{$this->pwd}");
-    curl_setopt($curl, CURLOPT_TIMEOUT, $this->timeout);
-		//curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($arr));
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
 		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
 		curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
@@ -147,21 +142,19 @@ class Api
       "offset" => $offset
 		);
 
+    $json = json_encode($arr);
 		$url = $this->url .'zone/getUpdateZone';
     $header = array();
     $header[] = 'Content-Type: application/json';
     $header[] = 'X-API-KEY: '.$this->api_key;
 		$curl = curl_init();
 
-		curl_setopt($curl, CURLOPT_URL, $url);
-		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
-    curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
-    curl_setopt($curl, CURLOPT_USERPWD, "{$this->username}:{$this->pwd}");
-    curl_setopt($curl, CURLOPT_TIMEOUT, $this->timeout);
-		curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($arr));
-		curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
-		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
-		curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
+    curl_setopt($curl, CURLOPT_URL, $url);
+    curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
+    curl_setopt($curl, CURLOPT_POSTFIELDS, $json);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
+    curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
 
 		$response = curl_exec($curl);
 
@@ -180,27 +173,26 @@ class Api
 		}
 	}
 
+
   public function getStockZone($zone_code)
   {
     $arr = array(
       "zone_code" => $zone_code
 		);
 
+    $json = json_encode($arr);
 		$url = $this->url .'stock_zone/getStockZone';
     $header = array();
     $header[] = 'Content-Type: application/json';
     $header[] = 'X-API-KEY: '.$this->api_key;
 		$curl = curl_init();
 
-		curl_setopt($curl, CURLOPT_URL, $url);
-		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
-    curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
-    curl_setopt($curl, CURLOPT_USERPWD, "{$this->username}:{$this->pwd}");
-    curl_setopt($curl, CURLOPT_TIMEOUT, $this->timeout);
-		curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($arr));
-		curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
-		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
-		curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
+    curl_setopt($curl, CURLOPT_URL, $url);
+    curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
+    curl_setopt($curl, CURLOPT_POSTFIELDS, $json);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
+    curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
 
 		$response = curl_exec($curl);
 
