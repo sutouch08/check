@@ -34,7 +34,7 @@ class Api
 		$curl = curl_init();
 
 		curl_setopt($curl, CURLOPT_URL, $url);
-		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
+		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
     curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
     curl_setopt($curl, CURLOPT_USERPWD, "{$this->username}:{$this->pwd}");
     curl_setopt($curl, CURLOPT_TIMEOUT, $this->timeout);
@@ -77,7 +77,7 @@ class Api
 		$curl = curl_init();
 
 		curl_setopt($curl, CURLOPT_URL, $url);
-		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
+		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
     curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
     curl_setopt($curl, CURLOPT_USERPWD, "{$this->username}:{$this->pwd}");
     curl_setopt($curl, CURLOPT_TIMEOUT, $this->timeout);
@@ -91,7 +91,7 @@ class Api
 		curl_close($curl);
 
 		$res = json_decode($response);
-    
+
 		if( ! empty($res) && $res->status)
 		{
       return $res;
@@ -154,7 +154,7 @@ class Api
 		$curl = curl_init();
 
 		curl_setopt($curl, CURLOPT_URL, $url);
-		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
+		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
     curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
     curl_setopt($curl, CURLOPT_USERPWD, "{$this->username}:{$this->pwd}");
     curl_setopt($curl, CURLOPT_TIMEOUT, $this->timeout);
@@ -193,7 +193,7 @@ class Api
 		$curl = curl_init();
 
 		curl_setopt($curl, CURLOPT_URL, $url);
-		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
+		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
     curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
     curl_setopt($curl, CURLOPT_USERPWD, "{$this->username}:{$this->pwd}");
     curl_setopt($curl, CURLOPT_TIMEOUT, $this->timeout);
