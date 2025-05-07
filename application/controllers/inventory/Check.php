@@ -418,8 +418,28 @@ class Check extends PS_Controller
     }
     else
     {
-      $sc = FALSE;
-      $this->error = "Checked row not found";
+      $this->load->model('masters/products_model');
+      $pd = $this->products_model->get_by_code($barcode);
+
+      if( ! empty($pd) && ! empty($pd->barcode))
+      {
+        $row = $this->check_model->get_sum_check_rows($id, $pd->barcode);
+
+        if( ! empty($row))
+        {
+          $row->bc_id = md5($row->barcode);
+        }
+        else
+        {
+          $sc = FALSE;
+          $this->error = "Checked row not found";
+        }
+      }
+      else
+      {
+        $sc = FALSE;
+        $this->error = "Checked row not found";
+      }
     }
 
     $arr = array(
@@ -535,7 +555,7 @@ class Check extends PS_Controller
     {
       if($doc->status == 'O')
       {
-        $last_active = strtotime($doc->last_active) + (5 * 60); //-- เพิ่ม 5 นาที
+        $last_active = strtotime($doc->last_active) + (1 * 60); //-- เพิ่ม 5 นาที
         $accept_time = date('Y-m-d H:i:s', $last_active);
 
         if($accept_time <= now())
@@ -585,15 +605,14 @@ class Check extends PS_Controller
                   }
 
                   $arr = array(
-                  'check_id' => $doc->id,
-                  'barcode' => $rs->barcode,
-                  'product_code' => $rs->code,
-                  'product_name' => $rs->name,
-                  'cost' => get_zero($rs->cost),
-                  'price' => get_zero($rs->price),
-                  'check_qty' => $rs->qty,
-                  'user_id' => $this->_user->id,
-                  'old_code' => $rs->old_code
+                    'check_id' => $doc->id,
+                    'barcode' => $rs->barcode,
+                    'product_code' => $rs->code,
+                    'product_name' => $rs->name,
+                    'cost' => get_zero($rs->cost),
+                    'price' => get_zero($rs->price),
+                    'check_qty' => $rs->qty,
+                    'user_id' => $this->_user->id
                   );
 
                   if( ! $this->check_model->add_result($arr))
@@ -909,7 +928,7 @@ class Check extends PS_Controller
 
       $result = $this->api->getStockZone($doc->zone_code);
 
-      if( ! empty($result) OR $result->status)
+      if( ! empty($result) && $result->status)
       {
         if($this->check_model->reset_stock_zone($doc->id))
         {
@@ -1048,8 +1067,7 @@ class Check extends PS_Controller
   		$sheet->setCellValue("H{$row}", "ยอดตรวจนับ (2)");
   		$sheet->setCellValue("I{$row}", "ยอดต่าง (2-1)");
   		$sheet->setCellValue("J{$row}", "มูลค่าต่าง (ทุน)");
-      $sheet->setCellValue("K{$row}", "มูลค่าต่าง (ขาย)");
-      $sheet->setCellValue("L{$row}", "รหัสเก่า");
+      $sheet->setCellValue("K{$row}", "มูลค่าต่าง (ขาย)");      
       $sheet->getStyle("A{$row}:K{$row}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 
   		$row++;
@@ -1073,7 +1091,6 @@ class Check extends PS_Controller
       		$sheet->setCellValue("I{$row}", "=H{$row} - G{$row}");
       		$sheet->setCellValue("J{$row}", "=E{$row} * I{$row}");
           $sheet->setCellValue("K{$row}", "=F{$row} * I{$row}");
-          $sheet->setCellValue("L{$row}", $rs->old_code);
           $row++;
           $no++;
         }

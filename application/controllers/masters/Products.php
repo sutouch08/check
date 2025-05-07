@@ -263,13 +263,13 @@ class Products extends PS_Controller{
 	      {
 	        $arr = array(
 						'id' => $rs->id,
-	          'barcode' => ( ! empty($rs->barcode) ? $rs->barcode : (empty($rs->old_code) ? $rs->code : $rs->old_code)),
+	          'barcode' => ( ! empty($rs->barcode) ? $rs->barcode : $rs->code),
 	          'code' => $rs->code,
 	          'name' => $rs->name,
 	          'style' => $rs->style_code,
 	          'cost' => $rs->cost,
 	          'price' => $rs->price,
-						'old_code' => $rs->old_code,
+						'old_code' => NULL,
 	          'last_sync' => date('Y-m-d H:i:s')
 	        );
 
