@@ -315,6 +315,7 @@ class Products extends PS_Controller{
 			$last_sync = $this->products_model->get_items_last_sync();
 		}
 
+		
 		$count_items = $this->api->countUpdateItems($last_sync);
 
 		if($count_items == FALSE)

@@ -2,7 +2,7 @@
 class Api
 {
   private $url;
-  private $api_key = 'adbd64b022fbb54d22e4d59437338740';
+  private $api_key;
   protected $ci;
 	public $error;
   protected $timeout = 0; //-- time out in seconds;
@@ -13,11 +13,15 @@ class Api
   {
 		$this->ci =& get_instance();
 
-    $this->url = getConfig('IX_API_HOST');
+    $this->url = trim(getConfig('IX_API_HOST'));
 		if($this->url[-1] != '/')
 		{
 			$this->url .'/';
 		}
+
+    $this->api_key = trim(getConfig('IX_API_KEY'));
+    $this->username = trim(getConfig('IX_API_USER'));
+    $this->pwd = trim(getConfig('IX_API_PWD'));
   }
 
 
@@ -34,10 +38,9 @@ class Api
     $curl = curl_init();
 
     curl_setopt($curl, CURLOPT_URL, $url);
-    curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
+    curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
     curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
     curl_setopt($curl, CURLOPT_USERPWD, "{$this->username}:{$this->pwd}");
-    curl_setopt($curl, CURLOPT_TIMEOUT, $this->timeout);
     curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($arr));
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
@@ -79,7 +82,9 @@ class Api
 		$curl = curl_init();
 
 		curl_setopt($curl, CURLOPT_URL, $url);
-		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
+		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
+    curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
+    curl_setopt($curl, CURLOPT_USERPWD, "{$this->username}:{$this->pwd}");
 		curl_setopt($curl, CURLOPT_POSTFIELDS, $json);
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
 		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
@@ -114,6 +119,8 @@ class Api
 
     curl_setopt($curl, CURLOPT_URL, $url);
     curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
+    curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
+    curl_setopt($curl, CURLOPT_USERPWD, "{$this->username}:{$this->pwd}");
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
     curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
@@ -151,7 +158,9 @@ class Api
 		$curl = curl_init();
 
     curl_setopt($curl, CURLOPT_URL, $url);
-    curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
+    curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
+    curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
+    curl_setopt($curl, CURLOPT_USERPWD, "{$this->username}:{$this->pwd}");
     curl_setopt($curl, CURLOPT_POSTFIELDS, $json);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
@@ -189,7 +198,9 @@ class Api
 		$curl = curl_init();
 
     curl_setopt($curl, CURLOPT_URL, $url);
-    curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
+    curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
+    curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
+    curl_setopt($curl, CURLOPT_USERPWD, "{$this->username}:{$this->pwd}");
     curl_setopt($curl, CURLOPT_POSTFIELDS, $json);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);

@@ -45,8 +45,30 @@
       <input type="text" class="form-control input-sm" name="IX_API_HOST" id="" value="<?php echo $IX_API_HOST; ?>" />
       <span class="help-block">กำหนด URL endpoint สำหรับการ Interface กับ ระบบ IX</span>
     </div>
-
 		<div class="divider-hidden"></div>
+
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12"><span class="form-control left-label">IX API Key</span></div>
+    <div class="col-lg-5 col-md-7 col-sm-7 col-xs-12">
+      <input type="text" class="form-control input-sm input-xlarge" name="IX_API_KEY" id="" value="<?php echo $IX_API_KEY; ?>" />
+      <span class="help-block">กำหนด API KEY สำหรับระบบ IX</span>
+    </div>
+    <div class="divider-hidden"></div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12"><span class="form-control left-label">IX API Username</span></div>
+    <div class="col-lg-5 col-md-7 col-sm-7 col-xs-12">
+      <input type="text" class="form-control input-sm input-large" name="IX_API_USER" id="" value="<?php echo $IX_API_USER; ?>" />
+      <span class="help-block">กำหนด API Username สำหรับการ Interface กับ ระบบ IX</span>
+    </div>
+		<div class="divider-hidden"></div>
+
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12"><span class="form-control left-label">IX API Password</span></div>
+    <div class="col-lg-5 col-md-7 col-sm-7 col-xs-12">
+      <input type="password" class="form-control input-sm input-large" name="IX_API_PWD" id="" value="<?php echo $IX_API_PWD; ?>" />
+      <span class="help-block">กำหนด API Password สำหรับการ Interface กับ ระบบ IX</span>
+    </div>
+		<div class="divider-hidden"></div>
+
+
+
 		<div class="divider-hidden"></div>
 
 
