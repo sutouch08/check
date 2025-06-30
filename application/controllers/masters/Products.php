@@ -13,38 +13,37 @@ class Products extends PS_Controller{
   }
 
 
-
-  public function index()
-  {
+	public function index()
+	{
 		$filter = array(
 			'barcode' => get_filter('barcode', 'pd_barcode', ''),
 			'code' => get_filter('code', 'pd_code', ''),
-      'name' => get_filter('name', 'pd_name', ''),
-      'style' => get_filter('style', 'pd_style', ''),
+			'name' => get_filter('name', 'pd_name', ''),
+			'style' => get_filter('style', 'pd_style', ''),
 			'active' => get_filter('active', 'pd_active', 'all')
 		);
 
-    if($this->input->post('search'))
-    {
-      redirect($this->home);
-    }
-    else
-    {
-      //--- แสดงผลกี่รายการต่อหน้า
-  		$perpage = get_rows();
+		if($this->input->post('search'))
+		{
+			redirect($this->home);
+		}
+		else
+		{
+			//--- แสดงผลกี่รายการต่อหน้า
+			$perpage = get_rows();
 
-  		$rows = $this->products_model->count_rows($filter);
+			$rows = $this->products_model->count_rows($filter);
 
-  		$filter['data'] = $this->products_model->get_list($filter, $perpage, $this->uri->segment($this->segment));
+			$filter['data'] = $this->products_model->get_list($filter, $perpage, $this->uri->segment($this->segment));
 
-  		//--- ส่งตัวแปรเข้าไป 4 ตัว base_url ,  total_row , perpage = 20, segment = 3
-  		$init	= pagination_config($this->home.'/index/', $rows, $perpage, $this->segment);
+			//--- ส่งตัวแปรเข้าไป 4 ตัว base_url ,  total_row , perpage = 20, segment = 3
+			$init	= pagination_config($this->home.'/index/', $rows, $perpage, $this->segment);
 
-  		$this->pagination->initialize($init);
+			$this->pagination->initialize($init);
 
-      $this->load->view('masters/products/product_list', $filter);
-    }
-  }
+			$this->load->view('masters/products/product_list', $filter);
+		}
+	}
 
 
   public function add_new()
@@ -200,6 +199,7 @@ class Products extends PS_Controller{
     $writer->save('php://output');
   }
 
+
 	public function delete_item()
 	{
 		$sc = TRUE;
@@ -223,8 +223,9 @@ class Products extends PS_Controller{
 		echo $sc === TRUE ? 'success' : $this->error;
 	}
 
-  public function count_update_items()
-  {
+
+	public function count_update_items()
+	{
 		$last_sync = $this->input->get('last_sync');
 		$this->load->library('api');
 
@@ -238,54 +239,54 @@ class Products extends PS_Controller{
 		{
 			echo $count;
 		}
-  }
+	}
 
 
-  public function get_update_items($offset)
-  {
+	public function get_update_items($offset)
+	{
 		$sc = TRUE;
 
 		$this->load->library('api');
 
-    $last_sync = $this->input->get('last_sync');
+		$last_sync = $this->input->get('last_sync');
 
 		$limit = 100;
 
 		$count = 0;
 
-    $ds = $this->api->getUpdateItems($last_sync, $limit, $offset);
+		$ds = $this->api->getUpdateItems($last_sync, $limit, $offset);
 
 		if( ! empty($ds) && $ds->status === TRUE)
 		{
 			if( ! empty($ds->items))
-	    {
-	      foreach($ds->items as $rs)
-	      {
-	        $arr = array(
+			{
+				foreach($ds->items as $rs)
+				{
+					$arr = array(
 						'id' => $rs->id,
-	          'barcode' => ( ! empty($rs->barcode) ? $rs->barcode : $rs->code),
-	          'code' => $rs->code,
-	          'name' => $rs->name,
-	          'style' => $rs->style_code,
-	          'cost' => $rs->cost,
-	          'price' => $rs->price,
+						'barcode' => ( ! empty($rs->barcode) ? $rs->barcode : $rs->code),
+						'code' => $rs->code,
+						'name' => $rs->name,
+						'style' => $rs->style_code,
+						'cost' => $rs->cost,
+						'price' => $rs->price,
 						'old_code' => NULL,
-	          'last_sync' => date('Y-m-d H:i:s')
-	        );
+						'last_sync' => date('Y-m-d H:i:s')
+					);
 
 
-	        if( ! $this->products_model->is_exists_id($rs->id))
-	        {
-	          $this->products_model->add($arr);
-	        }
-	        else
-	        {
-	          $this->products_model->update_by_id($rs->id, $arr);
-	        }
+					if( ! $this->products_model->is_exists_id($rs->id))
+					{
+						$this->products_model->add($arr);
+					}
+					else
+					{
+						$this->products_model->update_by_id($rs->id, $arr);
+					}
 
-	        $count++;
-	      }
-	    }
+					$count++;
+				}
+			}
 		}
 		else
 		{
@@ -293,18 +294,18 @@ class Products extends PS_Controller{
 			$this->error = $this->api->error;
 		}
 
-    $arr = array(
-			'status' => $sc === TRUE ? 'success' : 'failed',
-			'message' => $sc === TRUE ? 'success' : $this->error,
-			'updateCount' => $count
+		$arr = array(
+		'status' => $sc === TRUE ? 'success' : 'failed',
+		'message' => $sc === TRUE ? 'success' : $this->error,
+		'updateCount' => $count
 		);
 
 		echo json_encode($arr);
-  }
+	}
 
 
-  public function get_items_last_sync($option = 'update')
-  {
+	public function get_items_last_sync($option = 'update')
+	{
 		$this->load->library('api');
 
 		$last_sync = '2018-01-01 00:00:00';
@@ -322,10 +323,10 @@ class Products extends PS_Controller{
 		}
 
 
-    $arr = array('last_sync' => $last_sync, 'count_items' => empty($count_items) ? 0 : $count_items);
+		$arr = array('last_sync' => $last_sync, 'count_items' => empty($count_items) ? 0 : $count_items);
 
-    echo json_encode($arr);
-  }
+		echo json_encode($arr);
+	}
 
 
   public function close_sync()

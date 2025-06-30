@@ -23,41 +23,41 @@ class Api
 
   public function countUpdateItems($last_sync)
   {
-		$arr = array(
-			"date" => $last_sync
-		);
+    $arr = array(
+      "date" => $last_sync
+    );
 
-		$url = $this->url .'products/countUpdateItem';
+    $url = $this->url .'products/countUpdateItem';
     $header = array();
     $header[] = 'Content-Type: application/json';
     $header[] = 'X-API-KEY: '.$this->api_key;
-		$curl = curl_init();
+    $curl = curl_init();
 
-		curl_setopt($curl, CURLOPT_URL, $url);
-		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
+    curl_setopt($curl, CURLOPT_URL, $url);
+    curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
     curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
     curl_setopt($curl, CURLOPT_USERPWD, "{$this->username}:{$this->pwd}");
     curl_setopt($curl, CURLOPT_TIMEOUT, $this->timeout);
-		curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($arr));
-		curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
-		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
-		curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
+    curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($arr));
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
+    curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
 
-		$response = curl_exec($curl);
+    $response = curl_exec($curl);
 
-		curl_close($curl);
+    curl_close($curl);
 
-		$res = json_decode($response);
+    $res = json_decode($response);
 
-		if( ! empty($res) && $res->status)
-		{
+    if( ! empty($res) && $res->status)
+    {
       return $res->count;
-		}
-		else
-		{
-			$this->error = $response;
-			return FALSE;
-		}
+    }
+    else
+    {
+      $this->error = $response;
+      return FALSE;
+    }
   }
 
 
@@ -106,34 +106,35 @@ class Api
   //-------------------- Shop zone ----------------------------------------//
   public function countUpdateZone()
   {
-		$url = $this->url .'zone/countUpdateZone';
+    $url = $this->url .'zone/countUpdateZone';
     $header = array();
     $header[] = 'Content-Type: application/json';
     $header[] = 'X-API-KEY: '.$this->api_key;
-		$curl = curl_init();
+    $curl = curl_init();
 
-		curl_setopt($curl, CURLOPT_URL, $url);
-		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
-		curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
-		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
-		curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
+    curl_setopt($curl, CURLOPT_URL, $url);
+    curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
+    curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
 
-		$response = curl_exec($curl);
+    $response = curl_exec($curl);
 
-		curl_close($curl);
+    curl_close($curl);
 
-		$res = json_decode($response);
+    $res = json_decode($response);
 
-		if( ! empty($res) && $res->status)
-		{
+    if( ! empty($res) && $res->status)
+    {
       return $res->count;
-		}
-		else
-		{
-			$this->error = $response;
-			return FALSE;
-		}
+    }
+    else
+    {
+      $this->error = $response;
+      return FALSE;
+    }
   }
+
 
   public function getUpdateZone($limit = 100, $offset = 0)
 	{
