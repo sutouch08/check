@@ -21,13 +21,20 @@ function preSync() {
         let ds = JSON.parse(rs);
         count_items = ds.count_items;
 
-        if(count_items == 0) {
-          label.text("ไม่พบรายการที่ต้อง sync");
+        if(isJson(count_items)) {
+          let err = JSON.parse(count_items);
+          label.text(err.error);
           $('#btn-sync').addClass('hide');
         }
         else {
-          label.text("พบ " + addCommas(count_items) + " รายการที่ต้อง sync");
-          state = 'update_items';
+          if(count_items == 0) {
+            label.text("ไม่พบรายการที่ต้อง sync");
+            $('#btn-sync').addClass('hide');
+          }
+          else {
+            label.text("พบ " + addCommas(count_items) + " รายการที่ต้อง sync");
+            state = 'update_items';
+          }
         }
 
         $('#syncModal').modal('show');
